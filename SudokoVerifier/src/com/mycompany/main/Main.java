@@ -2,9 +2,11 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
  */
-package com.mycompany;
+package com.mycompany.main;
 
-import java.io.FileWriter;
+import com.mycompany.core.SudokoVerifierFactory;
+import java.io.File;
+import java.io.FileNotFoundException;
 
 /**
  *
@@ -12,9 +14,8 @@ import java.io.FileWriter;
  */
 public class Main {
 
-    private static void validateArgs(String[] args) throws IllegalArgumentException, Exception
+    private static void validateArgs(String[] args) throws IllegalArgumentException, Exception, FileNotFoundException
     {
-        
         if(args.length == 1 && args[0].equals("--help"))
         {
             throw new Exception("\nSudoko Verifier 9x9:\n\t"
@@ -36,6 +37,23 @@ public class Main {
         {
             throw new IllegalArgumentException("\nTry\n\t\tjava -jar SudokoVerifier.jar --help\nfor more help");
         }
+        
+        File file = new File(args[0]);
+        if(!file.exists())
+        {
+            throw new FileNotFoundException("\""+args[0]+"\""+"doesn't exist as a CSV input file");
+        }
+        
+        for(int mode : SudokoVerifierFactory.modes)
+        {
+            if(Integer.parseInt(args[1])==mode)
+            {
+                return;
+            }
+        }
+        
+        throw new IllegalArgumentException("Error: Unkown mode --> "+args[1]+"?!");
+        
     }
     /**
      * @param args the command line arguments
@@ -44,6 +62,8 @@ public class Main {
         try
         {
             validateArgs(args);
+            SudokoVerifier verifier = SudokoVerifierFactor.createVerifier(args[0],Integer.parseInt(args[1]));
+            verifier.printResult();
         }
         catch(Exception e)
         {
