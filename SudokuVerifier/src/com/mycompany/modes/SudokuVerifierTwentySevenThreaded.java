@@ -12,7 +12,7 @@ public class SudokuVerifierTwentySevenThreaded extends SudokuVerifier {
 
     public SudokuVerifierTwentySevenThreaded(SudokuData data) {
         super(data);
-        verify();
+        verify(); //ignore warning
     }
 
     @Override
