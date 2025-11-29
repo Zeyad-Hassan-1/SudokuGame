@@ -6,6 +6,7 @@ package com.mycompany.core;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 
 /**
  *
@@ -13,21 +14,22 @@ import java.util.Collections;
  */
 public abstract class SudokuVerifier {
 
-    protected ArrayList<ArrayList<Integer>> rows;
-    protected ArrayList<ArrayList<Integer>> columns;
-    protected ArrayList<ArrayList<Integer>> boxes;
+    protected SudokuData data;
     protected ArrayList<Duplicate> rowDuplicates;
     protected ArrayList<Duplicate> columnDuplicates;
     protected ArrayList<Duplicate> boxDuplicates;
 
-    public SudokuVerifier(ArrayList<ArrayList<Integer>> rows,
-            ArrayList<ArrayList<Integer>> columns,
-            ArrayList<ArrayList<Integer>> boxes) {
-        this.rows = rows;
-        this.columns = columns;
-        this.boxes = boxes;
+    public SudokuVerifier(SudokuData data) {
+        this.data = data;
+        
+        this.rowDuplicates = new ArrayList();
+        this.columnDuplicates = new ArrayList();
+        this.boxDuplicates = new ArrayList();
     }
 
+    /**
+     * Make benefit of the following class when making GUI version
+     */
     protected class Duplicate implements Comparable<Duplicate> {
 
         public static enum Type {
@@ -94,7 +96,7 @@ public abstract class SudokuVerifier {
                     .append(typeIdx)
                     .append(", #")
                     .append(value);
-            str.append("[");
+            str.append(", [");
             if (!duplicatesIdx.isEmpty()) {
                 str.append(duplicatesIdx.get(0));
                 for (int i = 1; i < duplicatesIdx.size(); i++) {
@@ -110,9 +112,9 @@ public abstract class SudokuVerifier {
     @Override
     public String toString() {
         if (rowDuplicates.isEmpty() && columnDuplicates.isEmpty() && boxDuplicates.isEmpty()) {
-            return "VALID";
+            return "\nVALID";
         } else {
-            StringBuilder str = new StringBuilder("INVALID\n\n");
+            StringBuilder str = new StringBuilder("\nINVALID\n\n");
             Collections.sort(rowDuplicates);
             Collections.sort(columnDuplicates);
             Collections.sort(boxDuplicates);
@@ -120,12 +122,12 @@ public abstract class SudokuVerifier {
                 str.append(duplicate.toString());
                 str.append("\n");
             }
-            str.append("------------------------------------------");
+            str.append("------------------------------------------\n");
             for (Duplicate duplicate : columnDuplicates) {
                 str.append(duplicate.toString());
                 str.append("\n");
             }
-            str.append("------------------------------------------");
+            str.append("------------------------------------------\n");
             for (Duplicate duplicate : boxDuplicates) {
                 str.append(duplicate.toString());
                 str.append("\n");
@@ -134,19 +136,89 @@ public abstract class SudokuVerifier {
         }
     }
 
-    protected abstract void propagate();
-
     protected abstract void verify();
 
-    protected abstract void verifyRows();
+    protected synchronized void verifyRows() {
+        for (int i = 0; i < data.getRows().size(); i++) {
+            verifyRow(data.getRows().get(i), i);
+        }
+    }
 
-    protected abstract void verifyColumns();
+    protected synchronized void verifyColumns() {
+        for (int i = 0; i < data.getColumns().size(); i++) {
+            verifyColumn(data.getColumns().get(i), i);
+        }
+    }
 
-    protected abstract void verifyBoxes();
+    protected synchronized void verifyBoxes() {
+        for (int i = 0; i < data.getBoxes().size(); i++) {
+            verifyBox(data.getBoxes().get(i), i);
+        }
+    }
 
-    protected abstract void verifyRow(ArrayList<Integer> row);
+    protected synchronized void verifyRow(ArrayList<Integer> row, int rowIndex) {
+        HashMap<Integer, ArrayList<Integer>> valuePositions = new HashMap<>();
 
-    protected abstract void verifyColumn(ArrayList<Integer> column);
+        for (int i = 0; i < row.size(); i++) {
+            int value = row.get(i);
+            valuePositions.putIfAbsent(value, new ArrayList<>());
+            valuePositions.get(value).add(i + 1);
+        }
 
-    protected abstract void verifyBox(ArrayList<Integer> box);
+        for (int value : valuePositions.keySet()) {
+            ArrayList<Integer> positions = valuePositions.get(value);
+            if (positions.size() > 1) {
+                Duplicate dup = new Duplicate(
+                        Duplicate.Type.ROW,
+                        rowIndex + 1,
+                        value,
+                        positions);
+                rowDuplicates.add(dup);
+            }
+        }
+    }
+
+    protected synchronized void verifyColumn(ArrayList<Integer> column, int colIndex) {
+        HashMap<Integer, ArrayList<Integer>> valuePositions = new HashMap<>();
+
+        for (int i = 0; i < column.size(); i++) {
+            int value = column.get(i);
+            valuePositions.putIfAbsent(value, new ArrayList<>());
+            valuePositions.get(value).add(i + 1);
+        }
+
+        for (int value : valuePositions.keySet()) {
+            ArrayList<Integer> positions = valuePositions.get(value);
+            if (positions.size() > 1) {
+                Duplicate dup = new Duplicate(
+                        Duplicate.Type.COL,
+                        colIndex + 1,
+                        value,
+                        positions);
+                columnDuplicates.add(dup);
+            }
+        }
+    }
+
+    protected synchronized void verifyBox(ArrayList<Integer> box, int boxIndex) {
+        HashMap<Integer, ArrayList<Integer>> valuePositions = new HashMap<>();
+
+        for (int i = 0; i < box.size(); i++) {
+            int value = box.get(i);
+            valuePositions.putIfAbsent(value, new ArrayList<>());
+            valuePositions.get(value).add(i + 1);
+        }
+
+        for (int value : valuePositions.keySet()) {
+            ArrayList<Integer> positions = valuePositions.get(value);
+            if (positions.size() > 1) {
+                Duplicate dup = new Duplicate(
+                        Duplicate.Type.BOX,
+                        boxIndex + 1,
+                        value,
+                        positions);
+                boxDuplicates.add(dup);
+            }
+        }
+    }
 }
