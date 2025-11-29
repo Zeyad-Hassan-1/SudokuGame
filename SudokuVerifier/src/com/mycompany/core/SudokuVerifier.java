@@ -112,9 +112,9 @@ public abstract class SudokuVerifier {
     @Override
     public String toString() {
         if (rowDuplicates.isEmpty() && columnDuplicates.isEmpty() && boxDuplicates.isEmpty()) {
-            return "VALID";
+            return "\nVALID";
         } else {
-            StringBuilder str = new StringBuilder("INVALID\n\n");
+            StringBuilder str = new StringBuilder("\nINVALID\n\n");
             Collections.sort(rowDuplicates);
             Collections.sort(columnDuplicates);
             Collections.sort(boxDuplicates);
@@ -122,12 +122,12 @@ public abstract class SudokuVerifier {
                 str.append(duplicate.toString());
                 str.append("\n");
             }
-            str.append("------------------------------------------");
+            str.append("------------------------------------------\n");
             for (Duplicate duplicate : columnDuplicates) {
                 str.append(duplicate.toString());
                 str.append("\n");
             }
-            str.append("------------------------------------------");
+            str.append("------------------------------------------\n");
             for (Duplicate duplicate : boxDuplicates) {
                 str.append(duplicate.toString());
                 str.append("\n");
