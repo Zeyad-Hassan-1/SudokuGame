@@ -25,11 +25,6 @@ public class SudokuVerifierThreeThreaded extends SudokuVerifier {
         Thread boxThread = new Thread(() -> verifyBoxes());
 
         // Start all threads
-
-        //@For Debugging ~Start
-        long processingStartTime = System.nanoTime();
-        //@For Debugging ~End
-        
         rowThread.start();
         columnThread.start();
         boxThread.start();
@@ -39,12 +34,6 @@ public class SudokuVerifierThreeThreaded extends SudokuVerifier {
             rowThread.join();
             columnThread.join();
             boxThread.join();
-            
-            //@For Debugging ~Start
-            long processingEndTime = System.nanoTime();
-            System.out.println("\nProcessing Time : " +((processingEndTime-processingStartTime)/1000)+" us\n");
-            //@For Debugging ~End
-            
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException("Thread interrupted during verification", e);

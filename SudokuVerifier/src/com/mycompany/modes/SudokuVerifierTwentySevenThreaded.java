@@ -20,13 +20,7 @@ public class SudokuVerifierTwentySevenThreaded extends SudokuVerifier {
      * @see https://www.geeksforgeeks.org/java/lambda-expressions-java-8/
      */
     protected void verify() {
-        ArrayList<Thread> threads = new ArrayList<>();
-        
-        //@For Debugging ~Start 
-        long processingStartTime = System.nanoTime();
-        //@For Debugging ~End
-        
-        for (int i = 0; i < 9; i++) {
+        ArrayList<Thread> threads = new ArrayList<>();for (int i = 0; i < 9; i++) {
             final int rowIndex = i;
             Thread rowThread = new Thread(() -> verifyRow(data.getRows().get(rowIndex), rowIndex));
             threads.add(rowThread);
@@ -55,9 +49,5 @@ public class SudokuVerifierTwentySevenThreaded extends SudokuVerifier {
                 throw new RuntimeException("Thread interrupted during verification", e);
             }
         }
-        //@For Debugging ~Start
-        long processingEndTime = System.nanoTime();
-        System.out.println("\nProcessing Time : " +((processingEndTime-processingStartTime)/1000)+" us\n");
-        //@For Debugging ~End
     }
 }
