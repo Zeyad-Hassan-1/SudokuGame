@@ -12,7 +12,7 @@ import java.util.HashMap;
  *
  * @author Hazem
  */
-public abstract class SudokuVerifier {
+public class SudokuVerifier {
 
     protected SudokuData data;
     protected ArrayList<Duplicate> rowDuplicates;
@@ -25,6 +25,8 @@ public abstract class SudokuVerifier {
         this.rowDuplicates = new ArrayList<>();
         this.columnDuplicates = new ArrayList<>();
         this.boxDuplicates = new ArrayList<>();
+        
+        verify();
     }
 
     /**
@@ -136,7 +138,11 @@ public abstract class SudokuVerifier {
         }
     }
 
-    protected abstract void verify();
+    protected void verify() {
+        verifyRows();
+        verifyColumns();
+        verifyBoxes();
+    }
 
     protected void verifyRows() {
         for (int i = 0; i < data.getRows().size(); i++) {
