@@ -1,9 +1,10 @@
-package com.mycompany.util;
+package com.mycompany.app.utility;
 
-import com.mycompany.core.SudokuData;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+
+import com.mycompany.app.models.SudokuData;
 
 public class CSVReader {
     
