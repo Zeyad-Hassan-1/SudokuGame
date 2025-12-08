@@ -1,4 +1,4 @@
-package com.mycompany.util;
+package com.mycompany.utility;
 
 import com.mycompany.core.SudokuData;
 import java.io.BufferedReader;

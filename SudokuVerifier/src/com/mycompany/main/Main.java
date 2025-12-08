@@ -5,7 +5,8 @@
 package com.mycompany.main;
 
 import com.mycompany.core.SudokuVerifier;
-import com.mycompany.util.CSVReader;
+import com.mycompany.utility.CSVReader;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 
