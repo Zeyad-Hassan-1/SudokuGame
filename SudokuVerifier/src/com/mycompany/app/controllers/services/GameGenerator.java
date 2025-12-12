@@ -1,5 +1,20 @@
 package com.mycompany.app.controllers.services;
 
-public class GameGenerator {
+/**
+ * Service class for generating Sudoku games of different difficulty levels.
+ * 
+ *Generation process:
+ * 
+ *   Start with a solved (valid) Sudoku board
+ *   Randomly remove a specified number of cells
+ *   Replace removed cells with 0 (empty)
+ * 
+ *Uses RandomPairs utility to select cells to remove, ensuring:
+ *   Randomness based on current time seed
+ *   No duplicate selections
+ * 
+ * @author Hazem
+ */
+public interface GameGenerator {
 
 }
