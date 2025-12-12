@@ -1,4 +1,4 @@
-package com.mycompany.app.common;
+package com.mycompany.app.models;
 
 /**
  * Catalog class representing game availability status.

@@ -1,4 +1,4 @@
-package com.mycompany.app.common.exceptions;
+package com.mycompany.app.exceptions;
 
 /**
  * Exception thrown when a game cannot be solved (e.g., not exactly 5 empty cells, or invalid state).

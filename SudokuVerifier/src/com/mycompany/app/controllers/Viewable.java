@@ -1,10 +1,11 @@
 package com.mycompany.app.controllers;
 
-import com.mycompany.app.common.Catalog;
-import com.mycompany.app.common.DifficultyEnum;
-import com.mycompany.app.common.exceptions.NotFoundException;
-import com.mycompany.app.common.exceptions.SolutionInvalidException;
-import com.mycompany.app.common.exceptions.InvalidGame;
+import com.mycompany.app.exceptions.InvalidGame;
+import com.mycompany.app.exceptions.NotFoundException;
+import com.mycompany.app.exceptions.SolutionInvalidException;
+import com.mycompany.app.models.Catalog;
+import com.mycompany.app.models.DifficultyEnum;
+
 import java.io.IOException;
 
 /**

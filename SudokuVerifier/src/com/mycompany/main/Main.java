@@ -4,7 +4,7 @@
  */
 package com.mycompany.main;
 
-import com.mycompany.app.models.SudokuVerifier;
+import com.mycompany.app.controllers.services.SudokuVerifier;
 import com.mycompany.app.utility.CSVReader;
 
 import java.io.File;

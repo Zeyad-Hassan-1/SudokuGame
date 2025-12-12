@@ -1,4 +1,4 @@
-package com.mycompany.app.common;
+package com.mycompany.app.models;
 
 /**
  * UserAction class representing a user action in the game.

@@ -1,4 +1,4 @@
-package com.mycompany.app.common.exceptions;
+package com.mycompany.app.exceptions;
 
 /**
  * Exception thrown when a source solution is invalid or incomplete (cannot be used to generate games).
