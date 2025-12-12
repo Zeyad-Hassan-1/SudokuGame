@@ -23,13 +23,24 @@ public class SudokuVerifier {
 
     public SudokuVerifier(SudokuData data) {
         this.data = data;
-        
+
         this.rowDuplicates = new ArrayList<>();
         this.columnDuplicates = new ArrayList<>();
         this.boxDuplicates = new ArrayList<>();
-        
+
         verify();
-        
+
+    }
+
+    public enum State {
+        /** Board is completely filled and has no duplicate values */
+        VALID,
+
+        /** Board has duplicate values in rows, columns, or boxes */
+        INVALID,
+
+        /** Board has empty cells (value 0) */
+        INCOMPLETE
     }
 
     /**
@@ -40,6 +51,7 @@ public class SudokuVerifier {
         public static enum Type {
             ROW, COL, BOX
         };
+
         private Type type;
         private int typeIdx;
         private int value;
@@ -113,8 +125,10 @@ public class SudokuVerifier {
             return str.toString();
         }
     }
-    private boolean incompleteFlag = false;
-    private String duplicateMessage(){
+
+    private State state;
+
+    private String duplicateMessage() {
         StringBuilder str = new StringBuilder();
         Collections.sort(rowDuplicates);
         Collections.sort(columnDuplicates);
@@ -135,18 +149,23 @@ public class SudokuVerifier {
         }
         return str.toString();
     }
+
     @Override
     public String toString() {
-        if (rowDuplicates.isEmpty() && columnDuplicates.isEmpty() && boxDuplicates.isEmpty() && !incompleteFlag) {
-            return "\nVALID";
-        } else if (incompleteFlag && rowDuplicates.isEmpty() && columnDuplicates.isEmpty() && boxDuplicates.isEmpty()) {
-            return "\nINCOMPLETE WITH NO DUPLICATES";
-        } else if (incompleteFlag) {
-            return "\nINCOMPLETE WITH DUPLICATES:\n" + duplicateMessage();
-        } else {
-            return "\nINVALID\n" + duplicateMessage();
+        switch (state) {
+            case INCOMPLETE:
+                if (rowDuplicates.isEmpty() && columnDuplicates.isEmpty() && boxDuplicates.isEmpty()) {
+                    return "\nINCOMPLETE WITH NO DUPLICATES";
+                }
+                else{
+                    return "\nINCOMPLETE WITH DUPLICATES:\n" + duplicateMessage();
+                }
+            case INVALID:
+                return "\nINVALID\n" + duplicateMessage();
+            default:
+                return "\nVALID";
         }
-    }
+     }
 
     protected void verify() {
         verifyRows();
@@ -178,7 +197,7 @@ public class SudokuVerifier {
         for (int i = 0; i < row.length; i++) {
             int value = row[i];
             if (value == 0) {
-                incompleteFlag = true;
+                state = State.INCOMPLETE;
                 continue;
             }
             valuePositions.putIfAbsent(value, new ArrayList<>());
@@ -188,6 +207,7 @@ public class SudokuVerifier {
         for (int value : valuePositions.keySet()) {
             ArrayList<Integer> positions = valuePositions.get(value);
             if (positions.size() > 1) {
+                state = State.INVALID;
                 Duplicate dup = new Duplicate(
                         Duplicate.Type.ROW,
                         rowIndex + 1,
@@ -204,7 +224,7 @@ public class SudokuVerifier {
         for (int i = 0; i < column.length; i++) {
             int value = column[i];
             if (value == 0) {
-                incompleteFlag = true;
+                state = State.INCOMPLETE;
                 continue;
             }
             valuePositions.putIfAbsent(value, new ArrayList<>());
@@ -214,6 +234,7 @@ public class SudokuVerifier {
         for (int value : valuePositions.keySet()) {
             ArrayList<Integer> positions = valuePositions.get(value);
             if (positions.size() > 1) {
+                state = State.INVALID;
                 Duplicate dup = new Duplicate(
                         Duplicate.Type.COL,
                         colIndex + 1,
@@ -230,7 +251,7 @@ public class SudokuVerifier {
         for (int i = 0; i < box.length; i++) {
             int value = box[i];
             if (value == 0) {
-                incompleteFlag = true;
+                state = State.INCOMPLETE;
                 continue;
             }
             valuePositions.putIfAbsent(value, new ArrayList<>());
@@ -240,6 +261,7 @@ public class SudokuVerifier {
         for (int value : valuePositions.keySet()) {
             ArrayList<Integer> positions = valuePositions.get(value);
             if (positions.size() > 1) {
+                state = State.INVALID;
                 Duplicate dup = new Duplicate(
                         Duplicate.Type.BOX,
                         boxIndex + 1,

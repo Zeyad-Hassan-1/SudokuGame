@@ -1,13 +1,21 @@
 package com.mycompany.app.models;
 
 /**
- * UserAction class representing a user action in the game.
- * Used for logging user actions (cell value changes).
- * Should contain information about the action: x, y, value, previous value.
+ * Represents a user action in the Sudoku game.
+ * Used for logging cell value changes to support undo functionality.
+ * 
+ * Each action records:
+    ▪️The cell position (x, y)
+    ▪️The new value entered by the user
+    ▪️The previous value (for undo)
+
+ * 
+ * Log format: (x, y, value, previousValue)
+ * Example: (3, 5, 7, 0) means cell (3,5) was changed from 0 to 7
+ * 
+ * @author Nour
  */
 public class UserAction {
-    // TODO: Implement UserAction class
-    // Should contain fields like: int x, int y, int value, int previousValue
-    // Or use a format that matches the log file format: (x, y, val, prev)
+
 }
 
