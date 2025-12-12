@@ -20,20 +20,24 @@ public class Main {
     {
         if(args.length == 1 && args[0].equals("--help"))
         {
-            throw new Exception("\nSudoko Verifier 9x9:\n\t"
-                    +          "    java -jar SudokoVerifier.jar <.csv filePath>\n\n\t"
-                    +          "    <.csv filePath>\tFull-Path/Relative-Path for csv file containting\n\t"
-                    +          "                   \ta 9x9 sudoko solution to be validated");
+            throw new Exception("\nSudoku Verifier 9x9:\n\t"
+                    +          "    java -jar SudokuVerifier.jar <csv_file> [allowZeros]\n\n\t"
+                    +          "    <csv_file>\t\tPath to CSV file containing 9x9 Sudoku board\n\t"
+                    +          "    [allowZeros]\t\tOptional: 'true' to allow zeros (for incomplete games),\n\t"
+                    +          "                   \t'false' for strict mode (default: false)\n\n\t"
+                    +          "Examples:\n\t"
+                    +          "    java -jar SudokuVerifier.jar valid.csv\n\t"
+                    +          "    java -jar SudokuVerifier.jar incomplete.csv true");
         }
-        if(args.length!=1)
+        if(args.length < 1 || args.length > 2)
         {
-            throw new IllegalArgumentException("\nTry\n\t\tjava -jar SudokoVerifier.jar --help\nfor more help");
+            throw new IllegalArgumentException("\nTry\n\t\tjava -jar SudokuVerifier.jar --help\nfor more help");
         }
         
         File file = new File(args[0]);
         if(!file.exists())
         {
-            throw new FileNotFoundException("\""+args[0]+"\""+"doesn't exist as a CSV input file");
+            throw new FileNotFoundException("\""+args[0]+"\""+" doesn't exist as a CSV input file");
         }
     }
     /**
@@ -43,7 +47,16 @@ public class Main {
         try
         {
             validateArgs(args);
-            SudokuVerifier verifier = new SudokuVerifier(CSVReader.readCSV(args[0]));
+            
+            String csvFile = args[0];
+            boolean allowZeros = false;
+            
+            // Parse allowZeros flag if provided
+            if(args.length == 2) {
+                allowZeros = Boolean.parseBoolean(args[1]);
+            }
+            
+            SudokuVerifier verifier = new SudokuVerifier(CSVReader.readCSV(csvFile, allowZeros));
             System.out.println(verifier.toString());
         }
         catch(Exception e)

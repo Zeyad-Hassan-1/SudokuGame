@@ -29,6 +29,7 @@ public class SudokuVerifier {
         this.boxDuplicates = new ArrayList<>();
         
         verify();
+        
     }
 
     /**
@@ -112,31 +113,38 @@ public class SudokuVerifier {
             return str.toString();
         }
     }
-
+    private boolean incompleteFlag = false;
+    private String duplicateMessage(){
+        StringBuilder str = new StringBuilder();
+        Collections.sort(rowDuplicates);
+        Collections.sort(columnDuplicates);
+        Collections.sort(boxDuplicates);
+        for (Duplicate duplicate : rowDuplicates) {
+            str.append(duplicate.toString());
+            str.append("\n");
+        }
+        str.append("------------------------------------------\n");
+        for (Duplicate duplicate : columnDuplicates) {
+            str.append(duplicate.toString());
+            str.append("\n");
+        }
+        str.append("------------------------------------------\n");
+        for (Duplicate duplicate : boxDuplicates) {
+            str.append(duplicate.toString());
+            str.append("\n");
+        }
+        return str.toString();
+    }
     @Override
     public String toString() {
-        if (rowDuplicates.isEmpty() && columnDuplicates.isEmpty() && boxDuplicates.isEmpty()) {
+        if (rowDuplicates.isEmpty() && columnDuplicates.isEmpty() && boxDuplicates.isEmpty() && !incompleteFlag) {
             return "\nVALID";
+        } else if (incompleteFlag && rowDuplicates.isEmpty() && columnDuplicates.isEmpty() && boxDuplicates.isEmpty()) {
+            return "\nINCOMPLETE WITH NO DUPLICATES";
+        } else if (incompleteFlag) {
+            return "\nINCOMPLETE WITH DUPLICATES:\n" + duplicateMessage();
         } else {
-            StringBuilder str = new StringBuilder("\nINVALID\n\n");
-            Collections.sort(rowDuplicates);
-            Collections.sort(columnDuplicates);
-            Collections.sort(boxDuplicates);
-            for (Duplicate duplicate : rowDuplicates) {
-                str.append(duplicate.toString());
-                str.append("\n");
-            }
-            str.append("------------------------------------------\n");
-            for (Duplicate duplicate : columnDuplicates) {
-                str.append(duplicate.toString());
-                str.append("\n");
-            }
-            str.append("------------------------------------------\n");
-            for (Duplicate duplicate : boxDuplicates) {
-                str.append(duplicate.toString());
-                str.append("\n");
-            }
-            return str.toString();
+            return "\nINVALID\n" + duplicateMessage();
         }
     }
 
@@ -169,6 +177,10 @@ public class SudokuVerifier {
 
         for (int i = 0; i < row.length; i++) {
             int value = row[i];
+            if (value == 0) {
+                incompleteFlag = true;
+                continue;
+            }
             valuePositions.putIfAbsent(value, new ArrayList<>());
             valuePositions.get(value).add(i + 1);
         }
@@ -191,6 +203,10 @@ public class SudokuVerifier {
 
         for (int i = 0; i < column.length; i++) {
             int value = column[i];
+            if (value == 0) {
+                incompleteFlag = true;
+                continue;
+            }
             valuePositions.putIfAbsent(value, new ArrayList<>());
             valuePositions.get(value).add(i + 1);
         }
@@ -213,6 +229,10 @@ public class SudokuVerifier {
 
         for (int i = 0; i < box.length; i++) {
             int value = box[i];
+            if (value == 0) {
+                incompleteFlag = true;
+                continue;
+            }
             valuePositions.putIfAbsent(value, new ArrayList<>());
             valuePositions.get(value).add(i + 1);
         }

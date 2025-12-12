@@ -7,8 +7,18 @@ import java.io.IOException;
 import com.mycompany.app.models.SudokuData;
 
 public class CSVReader {
-    
-    public static SudokuData readCSV(String filePath) throws IOException, NumberFormatException {
+
+    /**
+     * Reads a Sudoku board from a CSV file.
+     * 
+     * @param filePath Path to the CSV file
+     * @param allowZeros If true, allows values 0-9 (0 represents empty cells for incomplete games).
+     *                   If false, only allows values 1-9 (strict mode for solved boards).
+     * @return SudokuData containing the board data
+     * @throws IOException if file cannot be read or contains invalid data
+     * @throws NumberFormatException if values cannot be parsed as integers
+     */
+    public static SudokuData readCSV(String filePath, boolean allowZeros) throws IOException, NumberFormatException {
         SudokuData data = new SudokuData();
 
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
@@ -35,12 +45,24 @@ public class CSVReader {
                     int value = Integer.parseInt(values[colIndex].trim());
 
                     //@Validation ~ hazem
-                    if ((value >9)||(value<1)) {
-                        throw new IOException("Invalid value at [" + String.valueOf(rowIndex + 1)
-                                + "][" + String.valueOf(colIndex + 1)
-                                + "] = {"
-                                + String.valueOf(value)
-                                + "}\n");
+                    if (allowZeros) {
+                        // Allow 0-9 for incomplete games (0 = empty cell)
+                        if ((value > 9) || (value < 0)) {
+                            throw new IOException("Invalid value at [" + String.valueOf(rowIndex + 1)
+                                    + "][" + String.valueOf(colIndex + 1)
+                                    + "] = {"
+                                    + String.valueOf(value)
+                                    + "}\n");
+                        }
+                    } else {
+                        // Strict mode: only 1-9 allowed (for solved boards)
+                        if ((value > 9) || (value < 1)) {
+                            throw new IOException("Invalid value at [" + String.valueOf(rowIndex + 1)
+                                    + "][" + String.valueOf(colIndex + 1)
+                                    + "] = {"
+                                    + String.valueOf(value)
+                                    + "}\n");
+                        }
                     }
                     //EOV
 
@@ -67,5 +89,18 @@ public class CSVReader {
         }
 
         return data;
+    }
+
+    /**
+     * Reads a Sudoku board from a CSV file with strict validation (no zeros allowed).
+     * This is the default mode for reading solved Sudoku boards.
+     * 
+     * @param filePath Path to the CSV file
+     * @return SudokuData containing the board data
+     * @throws IOException if file cannot be read or contains invalid data (including zeros)
+     * @throws NumberFormatException if values cannot be parsed as integers
+     */
+    public static SudokuData readCSV(String filePath) throws IOException, NumberFormatException {
+        return readCSV(filePath, false);
     }
 }
