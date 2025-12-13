@@ -191,7 +191,7 @@ public class SudokuVerifier {
             default:
                 return "\nVALID";
         }
-    }
+     }
 
     protected void verify() {
         // Initialize state to VALID, will be changed if issues are found
