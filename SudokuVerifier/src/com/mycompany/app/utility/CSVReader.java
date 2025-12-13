@@ -4,8 +4,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
-import com.mycompany.app.models.SudokuData;
-
 public class CSVReader {
 
     /**
@@ -14,12 +12,12 @@ public class CSVReader {
      * @param filePath Path to the CSV file
      * @param allowZeros If true, allows values 0-9 (0 represents empty cells for incomplete games).
      *                   If false, only allows values 1-9 (strict mode for solved boards).
-     * @return SudokuData containing the board data
+     * @return int[][] representing the 9x9 Sudoku board
      * @throws IOException if file cannot be read or contains invalid data
      * @throws NumberFormatException if values cannot be parsed as integers
      */
-    public static SudokuData readCSV(String filePath, boolean allowZeros) throws IOException, NumberFormatException {
-        SudokuData data = new SudokuData();
+    public static int[][] readCSV(String filePath, boolean allowZeros) throws IOException, NumberFormatException {
+        int[][] board = new int[9][9];
 
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
@@ -66,16 +64,8 @@ public class CSVReader {
                     }
                     //EOV
 
-                    // Add to rows
-                    data.getRows()[rowIndex][colIndex] = value;
-
-                    // Add to columns
-                    data.getColumns()[colIndex][rowIndex] = value;
-
-                    // Add to boxes
-                    int boxIndex = (rowIndex / 3) * 3 + (colIndex / 3);
-                    int positionInBox = (rowIndex % 3) * 3 + (colIndex % 3);
-                    data.getBoxes()[boxIndex][positionInBox] = value;
+                    // Store value in board
+                    board[rowIndex][colIndex] = value;
                 }
 
                 rowIndex++;
@@ -88,7 +78,7 @@ public class CSVReader {
             //EOV
         }
 
-        return data;
+        return board;
     }
 
     /**
@@ -96,11 +86,11 @@ public class CSVReader {
      * This is the default mode for reading solved Sudoku boards.
      * 
      * @param filePath Path to the CSV file
-     * @return SudokuData containing the board data
+     * @return int[][] representing the 9x9 Sudoku board
      * @throws IOException if file cannot be read or contains invalid data (including zeros)
      * @throws NumberFormatException if values cannot be parsed as integers
      */
-    public static SudokuData readCSV(String filePath) throws IOException, NumberFormatException {
+    public static int[][] readCSV(String filePath) throws IOException, NumberFormatException {
         return readCSV(filePath, false);
     }
 }
