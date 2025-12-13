@@ -20,9 +20,12 @@ public class SudokuVerifier {
     protected ArrayList<Duplicate> rowDuplicates;
     protected ArrayList<Duplicate> columnDuplicates;
     protected ArrayList<Duplicate> boxDuplicates;
+    private State state;
 
-    public SudokuVerifier(SudokuData data) {
-        this.data = data;
+
+    public SudokuVerifier(int[][] board) {
+
+        this.data = convertToSudokuData(board);
 
         this.rowDuplicates = new ArrayList<>();
         this.columnDuplicates = new ArrayList<>();
@@ -30,6 +33,23 @@ public class SudokuVerifier {
 
         verify();
 
+    }
+
+    private SudokuData convertToSudokuData(int[][] board) {
+        SudokuData data = new SudokuData();
+
+        for (int row = 0; row < 9; row++) {
+            for (int col = 0; col < 9; col++) {
+                int value = board[row][col];
+                data.getRows()[row][col] = value;
+                data.getColumns()[col][row] = value;
+                int boxIndex = (row / 3) * 3 + (col / 3);
+                int positionInBox = (row % 3) * 3 + (col % 3);
+                data.getBoxes()[boxIndex][positionInBox] = value;
+            }
+        }
+
+        return data;
     }
 
     public enum State {
@@ -126,7 +146,14 @@ public class SudokuVerifier {
         }
     }
 
-    private State state;
+
+    /**
+     * Gets the current state of the Sudoku board
+     * @return the State enum value (VALID, INVALID, or INCOMPLETE)
+     */
+    public State getState() {
+        return state;
+    }
 
     private String duplicateMessage() {
         StringBuilder str = new StringBuilder();
@@ -156,8 +183,7 @@ public class SudokuVerifier {
             case INCOMPLETE:
                 if (rowDuplicates.isEmpty() && columnDuplicates.isEmpty() && boxDuplicates.isEmpty()) {
                     return "\nINCOMPLETE WITH NO DUPLICATES";
-                }
-                else{
+                } else {
                     return "\nINCOMPLETE WITH DUPLICATES:\n" + duplicateMessage();
                 }
             case INVALID:
@@ -168,9 +194,15 @@ public class SudokuVerifier {
      }
 
     protected void verify() {
+        // Initialize state to VALID, will be changed if issues are found
+        state = State.VALID;
+        
         verifyRows();
         verifyColumns();
         verifyBoxes();
+        
+        // If no duplicates found and board is complete, state remains VALID
+        // Otherwise, state has been set to INCOMPLETE or INVALID during verification
     }
 
     protected void verifyRows() {

@@ -56,7 +56,8 @@ public class Main {
                 allowZeros = Boolean.parseBoolean(args[1]);
             }
             
-            SudokuVerifier verifier = new SudokuVerifier(CSVReader.readCSV(csvFile, allowZeros));
+            int[][] board = CSVReader.readCSV(csvFile, allowZeros);
+            SudokuVerifier verifier = new SudokuVerifier(board);
             System.out.println(verifier.toString());
         }
         catch(Exception e)
