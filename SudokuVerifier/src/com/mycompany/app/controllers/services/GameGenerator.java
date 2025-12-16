@@ -15,6 +15,6 @@ package com.mycompany.app.controllers.services;
  * 
  * @author Hazem
  */
-public interface GameGenerator {
+public class GameGenerator {
 
 }

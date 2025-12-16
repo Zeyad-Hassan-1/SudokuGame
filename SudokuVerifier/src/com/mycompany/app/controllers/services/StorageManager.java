@@ -16,6 +16,6 @@ package com.mycompany.app.controllers.services;
  * (One action per line)
  * @author Hazem
  */
-public interface StorageManager {
+public class StorageManager {
 
 }
