@@ -1,4 +1,4 @@
-package com.mycompany.app.views;
+package com.mycompany.app.controllers;
 
 import com.mycompany.app.exceptions.InvalidGame;
 import com.mycompany.app.exceptions.NotFoundException;
@@ -8,8 +8,7 @@ import com.mycompany.app.models.UserAction;
 import java.io.IOException;
 
 /**
- * Interface of the viewer representing the actions that are needed by the
- * controller.
+ * Interface of the viewer representing the actions that are needed by the controller.
  */
 interface Controllable {
     boolean[] getCatalog();
