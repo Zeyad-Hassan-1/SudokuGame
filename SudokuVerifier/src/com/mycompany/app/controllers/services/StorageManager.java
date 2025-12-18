@@ -14,7 +14,7 @@ package com.mycompany.app.controllers.services;
  * (2, 3, 5, 0)
  * (4, 7, 8, 0)
  * (One action per line)
- * @author Hazem
+ * @author
  */
 public class StorageManager {
 

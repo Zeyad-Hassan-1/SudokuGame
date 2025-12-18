@@ -9,11 +9,9 @@ package com.mycompany.app.controllers.services;
  *   Randomly remove a specified number of cells
  *   Replace removed cells with 0 (empty)
  * 
- *Uses RandomPairs utility to select cells to remove, ensuring:
- *   Randomness based on current time seed
- *   No duplicate selections
+ *Uses @see RandomPairs utility to select cells to remove
  * 
- * @author Hazem
+ * @author Menna
  */
 public class GameGenerator {
 
