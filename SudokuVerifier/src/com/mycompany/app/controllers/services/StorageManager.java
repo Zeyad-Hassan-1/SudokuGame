@@ -345,6 +345,38 @@ public class StorageManager {
             }
         }
     }
+        private Game readGameFromFile(String filepath) throws IOException {
+        int[][] board = new int[9][9];
+        
+        try (BufferedReader reader = new BufferedReader(new FileReader(filepath))) {
+            String line;
+            int row = 0;
+            
+            while ((line = reader.readLine()) != null && row < 9) {
+                String[] values = line.split(",");
+                
+                if (values.length != 9) {
+                    throw new IOException("Invalid game file format: row " + (row + 1) + 
+                                        " has " + values.length + " values instead of 9");
+                }
+                
+                for (int col = 0; col < 9; col++) {
+                    board[row][col] = Integer.parseInt(values[col].trim());
+                }
+                
+                row++;
+            }
+            
+            if (row < 9) {
+                throw new IOException("Invalid game file format: only " + row + " rows found");
+            }
+        }
+        
+        return new Game(board);
+    }
+
+
+
 
 
 }
