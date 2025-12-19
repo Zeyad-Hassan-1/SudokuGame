@@ -289,7 +289,12 @@ public class StorageManager {
         }
     }
 
-    
+        public void clearAllGames() throws IOException {
+        clearGamesForDifficulty(DifficultyEnum.EASY);
+        clearGamesForDifficulty(DifficultyEnum.MEDIUM);
+        clearGamesForDifficulty(DifficultyEnum.HARD);
+    }
+
 
     
 
