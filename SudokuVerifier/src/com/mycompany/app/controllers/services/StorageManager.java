@@ -330,6 +330,22 @@ public class StorageManager {
         
         return "game_" + (maxNumber + 1) + ".csv";
     }
+    private void writeGameToFile(Game game, String filepath) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filepath))) {
+            for (int row = 0; row < 9; row++) {
+                StringBuilder line = new StringBuilder();
+                for (int col = 0; col < 9; col++) {
+                    line.append(game.board[row][col]);
+                    if (col < 8) {
+                        line.append(",");
+                    }
+                }
+                writer.write(line.toString());
+                writer.newLine();
+            }
+        }
+    }
+
 
 }
 
