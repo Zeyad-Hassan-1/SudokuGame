@@ -11,7 +11,7 @@ package com.mycompany.app.models;
  * @author Nour
  */
 public class Game {
-   int[][] board;
+   public int[][] board;
 
    public Game(int[][] board) {
       // IMPORTANT: DON'T COPY THE BOARD BY VALUE
