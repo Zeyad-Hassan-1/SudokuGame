@@ -30,7 +30,9 @@ public class Game {
       this.board = board;
    }
 
- 
+   public void setDifficulty(DifficultyEnum difficulty) {
+      this.difficulty = difficulty;
+   }
 
  
 
