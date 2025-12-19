@@ -268,6 +268,16 @@ public class StorageManager {
     }
 
 
+        public int getGameCount(DifficultyEnum difficulty) {
+        String directory = getDirectoryForDifficulty(difficulty);
+        File dir = new File(directory);
+        File[] files = dir.listFiles((d, name) -> name.startsWith("game_") && name.endsWith(".csv"));
+        return (files != null) ? files.length : 0;
+    }
+
+    
+
+
 
 }
 
