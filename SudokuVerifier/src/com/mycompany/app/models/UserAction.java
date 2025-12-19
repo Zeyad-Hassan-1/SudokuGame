@@ -46,6 +46,20 @@ public class UserAction {
    }
 
 
+   public static UserAction fromLogEntry(String logEntry) {
+      String cleaned = logEntry.replaceAll("[()]", "").trim();
+      String[] parts = cleaned.split(",");
+      if (parts.length != 4) {
+         throw new IllegalArgumentException("Invalid format: " + logEntry);
+      }
+      return new UserAction(
+            Integer.parseInt(parts[0].trim()),
+            Integer.parseInt(parts[1].trim()),
+            Integer.parseInt(parts[2].trim()),
+            Integer.parseInt(parts[3].trim()));
+   }
+
+
 
 
 
