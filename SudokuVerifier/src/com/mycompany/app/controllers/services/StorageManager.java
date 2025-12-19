@@ -309,7 +309,27 @@ public class StorageManager {
                 throw new IllegalArgumentException("Unknown difficulty: " + difficulty);
         }
     }
-
+    private String generateUniqueFilename(String directory) {
+        File dir = new File(directory);
+        File[] files = dir.listFiles((d, name) -> name.startsWith("game_") && name.endsWith(".csv"));
+        
+        int maxNumber = 0;
+        if (files != null) {
+            for (File file : files) {
+                String name = file.getName();
+                try {
+                    // Extract number from "game_X.csv"
+                    String numberStr = name.substring(5, name.length() - 4);
+                    int number = Integer.parseInt(numberStr);
+                    maxNumber = Math.max(maxNumber, number);
+                } catch (Exception e) {
+                    // Ignore files that don't match the expected format
+                }
+            }
+        }
+        
+        return "game_" + (maxNumber + 1) + ".csv";
+    }
 
 }
 
