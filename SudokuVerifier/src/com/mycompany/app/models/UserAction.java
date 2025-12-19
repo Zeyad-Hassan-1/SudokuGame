@@ -37,6 +37,9 @@ public class UserAction {
   public int getValue() {
       return value;
    }
+   public int getPreviousValue() {
+      return previousValue;
+   }
 
 
 
