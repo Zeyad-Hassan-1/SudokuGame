@@ -275,6 +275,22 @@ public class StorageManager {
         return (files != null) ? files.length : 0;
     }
 
+
+    
+    public void clearGamesForDifficulty(DifficultyEnum difficulty) throws IOException {
+        String directory = getDirectoryForDifficulty(difficulty);
+        File dir = new File(directory);
+        File[] files = dir.listFiles((d, name) -> name.startsWith("game_") && name.endsWith(".csv"));
+        
+        if (files != null) {
+            for (File file : files) {
+                Files.delete(file.toPath());
+            }
+        }
+    }
+
+    
+
     
 
 
