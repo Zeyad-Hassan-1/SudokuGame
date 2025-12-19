@@ -251,6 +251,16 @@ public class StorageManager {
         File[] files = dir.listFiles((d, name) -> name.startsWith("game_") && name.endsWith(".csv"));
         return files != null && files.length > 0;
     }
+
+
+
+        public void clearGameLog() throws IOException {
+        File logFile = new File(GAME_LOG_FILE);
+        if (logFile.exists()) {
+            Files.delete(logFile.toPath());
+        }
+    }
+
 }
 
 
