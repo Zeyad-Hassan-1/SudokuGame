@@ -1,5 +1,9 @@
 package com.mycompany.app.controllers.services;
 
+import java.util.List;
+import com.mycompany.app.models.Game;
+import com.mycompany.app.utility.RandomPairs;
+
 /**
  * Service class for generating Sudoku games of different difficulty levels.
  * 
@@ -14,5 +18,50 @@ package com.mycompany.app.controllers.services;
  * @author Menna
  */
 public class GameGenerator {
+    private RandomPairs randomPairs;
+    
+    public GameGenerator() {
+        this.randomPairs = new RandomPairs();
+    }
+    
+    
+    public Game generateGame(Game solvedGame, String difficulty) {
+        int[][] board = deepCopyBoard(solvedGame.board);
+        int cellsToRemove = getCellsToRemove(difficulty);
+        
+        
+        List<int[]> positions = randomPairs.generateDistinctPairs(cellsToRemove);
+        for (int[] pos : positions) {
+            int row = pos[0];
+            int col = pos[1];
+            board[row][col] = 0; 
+        }
+        return new Game(board);
+    }
+    
+    
+    public Game[] generateAllLevels(Game solvedGame) {
+        Game[] games = new Game[3];
+        games[0] = generateGame(solvedGame, "EASY");
+        games[1] = generateGame(solvedGame, "MEDIUM");
+        games[2] = generateGame(solvedGame, "HARD");
+        return games;
+    }
+    
+    private int getCellsToRemove(String difficulty) {
+        switch (difficulty.toUpperCase()) {
+            case "EASY": return 10;
+            case "MEDIUM": return 25;
+            case "HARD": return 20;
+            default: throw new IllegalArgumentException("Invalid difficulty: " + difficulty);
+        }
+    }
+    private int[][] deepCopyBoard(int[][] original) {
+        int[][] copy = new int[9][9];
+        for (int i = 0; i < 9; i++) {
+            System.arraycopy(original[i], 0, copy[i], 0, 9);
+        }
+        return copy;
+    }
 
 }
