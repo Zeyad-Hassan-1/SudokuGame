@@ -11,10 +11,10 @@ package com.mycompany.app.models;
  * @author Nour
  */
 public class Game {
-   int[][] board;
+   public int[][] board;
    private DifficultyEnum difficulty;
 
-   public Game(int[][] board, DifficultyEnum difficulty) {
+   public Game(int[][] board) {
       // IMPORTANT: DON'T COPY THE BOARD BY VALUE
       // USE REFERENCES
       this.board = board;
