@@ -51,8 +51,8 @@ public class GameGenerator {
     private int getCellsToRemove(String difficulty) {
         switch (difficulty.toUpperCase()) {
             case "EASY": return 10;
-            case "MEDIUM": return 25;
-            case "HARD": return 20;
+            case "MEDIUM": return 20;
+            case "HARD": return 25;
             default: throw new IllegalArgumentException("Invalid difficulty: " + difficulty);
         }
     }
