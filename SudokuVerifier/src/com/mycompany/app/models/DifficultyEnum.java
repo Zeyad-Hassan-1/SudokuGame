@@ -32,6 +32,19 @@ public enum DifficultyEnum {
         }
     }
 
+    public char toChar() {
+        switch (this) {
+            case EASY:
+                return 'E';
+            case MEDIUM:
+                return 'M';
+            case HARD:
+                return 'H';
+            default:
+                throw new IllegalArgumentException("Invalid difficulty: " + this);
+        }
+    }
+
     @Override
     public String toString() {
         return name().toLowerCase();

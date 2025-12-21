@@ -55,7 +55,8 @@ public class SudokuSolver {
         final int[][] solutionWrapper = new int[1][];
         final boolean[] foundFlag = { false };
 
-        while (iterator.hasNext() && !foundFlag[0]) { // Stops submitting when found
+        // Submit all permutations to be tested
+        while (iterator.hasNext() && !foundFlag[0]) {
             final int[] permCopy = iterator.next().clone();
 
             executor.submit(() -> {
@@ -69,7 +70,23 @@ public class SudokuSolver {
             });
         }
 
-        executor.shutdownNow(); // Clean up everything
+        // Stop accepting new tasks
+        executor.shutdown();
+        
+        // Wait until solution found or all tasks complete
+        while (!foundFlag[0] && !executor.isTerminated()) {
+            try {
+                executor.awaitTermination(10, java.util.concurrent.TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
+        
+        // Cancel remaining tasks once solution is found
+        if (foundFlag[0]) {
+            executor.shutdownNow();
+        }
 
         if (solutionWrapper[0] == null) {
             throw new InvalidGame("No valid solution exists");
@@ -82,32 +99,90 @@ public class SudokuSolver {
     /**
      * Test the solver.
      */
-    /*
-     * public static void main(String[] args) {
-     * try {
-     * int[][] testBoard = {
-     * { 5, 3, 4, 6, 7, 8, 9, 1, 2 },
-     * { 6, 7, 2, 1, 9, 5, 3, 4, 8 },
-     * { 1, 9, 8, 3, 4, 2, 5, 6, 7 },
-     * { 8, 5, 9, 7, 6, 1, 4, 2, 3 },
-     * { 4, 2, 6, 8, 5, 3, 7, 9, 1 },
-     * { 7, 1, 3, 9, 2, 4, 8, 5, 6 },
-     * { 9, 6, 1, 5, 3, 7, 2, 8, 4 },
-     * { 2, 8, 7, 4, 1, 0, 6, 3, 0 }, // 2 zeros: [7][5]=9, [7][8]=5
-     * { 3, 4, 5, 2, 0, 6, 1, 0, 0 } // 3 zeros: [8][4]=8, [8][6]=1, [8][8]=9
-     * };
-     * // Solution should be: [9, 5, 8, 1, 9]
-     * Game currentGame = new Game(testBoard);
-     * 
-     * int[] emptyPositions = currentGame.findEmptyCells(testBoard);
-     * System.out.println("Empty cells found: " + emptyPositions.length);
-     * 
-     * int[] solution = SudokuSolver.solve(testBoard);
-     * System.out.println("Solution found: " + Arrays.toString(solution));
-     * 
-     * } catch (Exception e) {
-     * System.out.println("Error: " + e.getMessage());
-     * }
-     * }
-     */
+    // public static void main(String[] args) {
+    //     System.out.println("=== TEST 1: Hardcoded board (from incomplete storage) ===");
+    //     try {
+    //         int[][] testBoard = {
+    //             { 5, 3, 4, 6, 7, 8, 0, 1, 2 },
+    //             { 6, 7, 2, 1, 9, 5, 3, 4, 8 },
+    //             { 1, 9, 8, 3, 4, 2, 5, 6, 7 },
+    //             { 8, 5, 9, 7, 6, 1, 4, 2, 3 },
+    //             { 4, 2, 6, 8, 5, 3, 7, 0, 1 },
+    //             { 7, 1, 3, 9, 2, 4, 8, 5, 6 },
+    //             { 9, 6, 1, 5, 0, 7, 2, 0, 4 },
+    //             { 2, 8, 7, 4, 0, 9, 6, 3, 5 },
+    //             { 3, 4, 5, 2, 8, 6, 1, 7, 9 }
+    //         };
+            
+    //         Game currentGame = new Game(testBoard);
+    //         int[] emptyPositions = currentGame.findEmptyCells(testBoard);
+    //         System.out.println("Empty cells found: " + emptyPositions.length);
+            
+    //         for (int pos : emptyPositions) {
+    //             int row = pos / 9;
+    //             int col = pos % 9;
+    //             System.out.println("  Empty at [" + row + "][" + col + "]");
+    //         }
+            
+    //         int[] solution = SudokuSolver.solve(testBoard);
+    //         System.out.println("Solution found: " + java.util.Arrays.toString(solution));
+            
+    //         // Apply and show
+    //         for (int i = 0; i < emptyPositions.length; i++) {
+    //             int row = emptyPositions[i] / 9;
+    //             int col = emptyPositions[i] % 9;
+    //             System.out.println("  [" + row + "][" + col + "] = " + solution[i]);
+    //         }
+    //         System.out.println("TEST 1 PASSED!\n");
+    //     } catch (Exception e) {
+    //         System.out.println("TEST 1 FAILED: " + e.getMessage());
+    //         e.printStackTrace();
+    //     }
+        
+    //     System.out.println("=== TEST 2: Read board from file ===");
+    //     try {
+    //         int[][] boardFromFile = readBoardFromFile("SudokuVerifier/storage/incomplete/current_game.csv");
+            
+    //         Game currentGame = new Game(boardFromFile);
+    //         int[] emptyPositions = currentGame.findEmptyCells(boardFromFile);
+    //         System.out.println("Empty cells found: " + emptyPositions.length);
+            
+    //         for (int pos : emptyPositions) {
+    //             int row = pos / 9;
+    //             int col = pos % 9;
+    //             System.out.println("  Empty at [" + row + "][" + col + "]");
+    //         }
+            
+    //         int[] solution = SudokuSolver.solve(boardFromFile);
+    //         System.out.println("Solution found: " + java.util.Arrays.toString(solution));
+            
+    //         // Apply and show
+    //         for (int i = 0; i < emptyPositions.length; i++) {
+    //             int row = emptyPositions[i] / 9;
+    //             int col = emptyPositions[i] % 9;
+    //             System.out.println("  [" + row + "][" + col + "] = " + solution[i]);
+    //         }
+    //         System.out.println("TEST 2 PASSED!");
+    //     } catch (Exception e) {
+    //         System.out.println("TEST 2 FAILED: " + e.getMessage());
+    //         e.printStackTrace();
+    //     }
+    // }
+    
+    // private static int[][] readBoardFromFile(String path) throws Exception {
+    //     int[][] board = new int[9][9];
+    //     java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(path));
+    //     String line;
+    //     int row = 0;
+    //     while ((line = reader.readLine()) != null && row < 9) {
+    //         String[] values = line.split(",");
+    //         for (int col = 0; col < 9; col++) {
+    //             board[row][col] = Integer.parseInt(values[col].trim());
+    //         }
+    //         row++;
+    //     }
+    //     reader.close();
+    //     return board;
+    // }
+
 }

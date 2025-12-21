@@ -262,6 +262,30 @@ public class SudokuController implements Viewable {
         return (currentGame != null) ? currentGame.board : null;
     }
 
+    @Override
+    public Game loadCurrentGame() throws Exception {
+        try {
+            Game game = storageManager.loadCurrentGame();
+            if (game != null) {
+                this.currentGame = game;
+                this.currentVerifier = new SudokuVerifier(game.board);
+            }
+            return game;
+        } catch (Exception e) {
+            throw new Exception("Failed to load current game: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Sets the current game from a board (used when GUI loads a game).
+     */
+    public void setCurrentGame(int[][] board) throws IOException {
+        this.currentGame = new Game(board);
+        this.currentVerifier = new SudokuVerifier(board);
+        storageManager.saveCurrentGame(currentGame);
+        storageManager.clearGameLog();
+    }
+
     public Game loadSolutionFromFile(String filePath) throws IOException {
         try {
             int[][] board = CSVReader.readCSV(filePath, false);

@@ -98,9 +98,16 @@ public class ViewAdapter implements Controllable {
 
     @Override
     public int[][] solveGame(int[][] board) throws InvalidGame {
-        Game game = new Game(board);
+        // Use the controller's current board state (which has user updates)
+        // instead of the passed board which may be out of sync
+        int[][] actualBoard = controller.getCurrentBoard();
+        if (actualBoard == null) {
+            actualBoard = board;
+        }
+        
+        Game game = new Game(actualBoard);
         int[] solution = controller.solveGame(game);
-        int[] emptyPositions = game.findEmptyCells(board);
+        int[] emptyPositions = game.findEmptyCells(actualBoard);
         int[][] result = new int[5][3];
         
         for (int i = 0; i < 5; i++) {
@@ -118,6 +125,31 @@ public class ViewAdapter implements Controllable {
     @Override
     public void logUserAction(UserAction userAction) throws IOException {
         controller.logUserAction(userAction.toLogEntry());
+    }
+
+    @Override
+    public int[][] getCurrentBoard() {
+        return controller.getCurrentBoard();
+    }
+
+    @Override
+    public int[][] loadCurrentGame() throws Exception {
+        Game game = controller.loadCurrentGame();
+        return (game != null) ? game.board : null;
+    }
+
+    /**
+     * Set the current game in the controller (called when displaying a board).
+     */
+    public void setCurrentGame(int[][] board) throws IOException {
+        if (controller instanceof SudokuController) {
+            ((SudokuController) controller).setCurrentGame(board);
+        }
+    }
+
+    @Override
+    public java.util.List<String> getAllLogEntries() throws IOException {
+        return ((SudokuController) controller).getAllLogEntries();
     }
 
     public UserAction logAndUpdateCell(int row, int col, int newValue) throws IOException {

@@ -64,5 +64,25 @@ public interface Viewable {
      * @throws IOException if logging fails
      */
     void logUserAction(String userAction) throws IOException;
+
+    /**
+     * Gets the current game board that's in progress.
+     * @return Current game board or null if no game is loaded
+     */
+    int[][] getCurrentBoard();
+
+    /**
+     * Loads the current/incomplete game from storage.
+     * @return Game instance of the current game or null if none exists
+     * @throws Exception if loading fails
+     */
+    Game loadCurrentGame() throws Exception;
+
+    /**
+     * Gets all log entries for the current game.
+     * @return List of log entry strings
+     * @throws IOException if reading log fails
+     */
+    java.util.List<String> getAllLogEntries() throws IOException;
 }
 

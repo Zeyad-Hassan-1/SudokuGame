@@ -27,20 +27,41 @@ import java.util.Random;
  * @author nour
  */
 public class StorageManager {
-    private static final String BASE_DIR = "storage";
-    private static final String EASY_DIR = BASE_DIR + File.separator + "easy";
-    private static final String MEDIUM_DIR = BASE_DIR + File.separator + "medium";
-    private static final String HARD_DIR = BASE_DIR + File.separator + "hard";
-    private static final String INCOMPLETE_DIR = BASE_DIR + File.separator + "incomplete";
-    
-    private static final String CURRENT_GAME_FILE = INCOMPLETE_DIR + File.separator + "current_game.csv";
-    private static final String GAME_LOG_FILE = INCOMPLETE_DIR + File.separator + "gameLog.txt";
+    private final String BASE_DIR;
+    private final String EASY_DIR;
+    private final String MEDIUM_DIR;
+    private final String HARD_DIR;
+    private final String INCOMPLETE_DIR;
+    private final String CURRENT_GAME_FILE;
+    private final String GAME_LOG_FILE;
     
     private final Random random;
     
     public StorageManager() {
+        // Determine base directory - check if running from SudokuVerifier or parent
+        String workingDir = System.getProperty("user.dir");
+        if (workingDir.endsWith("SudokuVerifier")) {
+            BASE_DIR = "storage";
+        } else if (new File(workingDir + File.separator + "SudokuVerifier" + File.separator + "storage").exists()) {
+            BASE_DIR = "SudokuVerifier" + File.separator + "storage";
+        } else if (new File(workingDir + File.separator + "storage").exists()) {
+            BASE_DIR = "storage";
+        } else {
+            // Default - create in SudokuVerifier/storage
+            BASE_DIR = "SudokuVerifier" + File.separator + "storage";
+        }
+        
+        EASY_DIR = BASE_DIR + File.separator + "easy";
+        MEDIUM_DIR = BASE_DIR + File.separator + "medium";
+        HARD_DIR = BASE_DIR + File.separator + "hard";
+        INCOMPLETE_DIR = BASE_DIR + File.separator + "incomplete";
+        CURRENT_GAME_FILE = INCOMPLETE_DIR + File.separator + "current_game.csv";
+        GAME_LOG_FILE = INCOMPLETE_DIR + File.separator + "gameLog.txt";
+        
         this.random = new Random();
         initializeDirectories();
+        
+        System.out.println("StorageManager initialized with base: " + new File(BASE_DIR).getAbsolutePath());
     }
     
     // ==================== DIRECTORY SETUP ====================
@@ -110,12 +131,22 @@ public class StorageManager {
     }
     
     /**
+     * Load the current/incomplete game from storage.
+     */
+    public Game loadCurrentGame() throws IOException {
+        if (!hasUnfinishedGame()) {
+            return null;
+        }
+        return readGameFromFile(CURRENT_GAME_FILE);
+    }
+
+    /**
      * Delete the current game and its log (called when game is completed).
      */
     public void deleteCurrentGameWithLog() throws IOException {
         File currentGame = new File(CURRENT_GAME_FILE);
         File logFile = new File(GAME_LOG_FILE);
-        
+
         if (currentGame.exists()) {
             Files.delete(currentGame.toPath());
         }

@@ -25,4 +25,13 @@ interface Controllable {
 
     // Logs the user action
     void logUserAction(UserAction userAction) throws IOException;
+
+    // Gets the current game board in progress
+    int[][] getCurrentBoard();
+
+    // Loads the current/incomplete game from storage
+    int[][] loadCurrentGame() throws Exception;
+
+    // Gets all log entries for the current game
+    java.util.List<String> getAllLogEntries() throws IOException;
 }
