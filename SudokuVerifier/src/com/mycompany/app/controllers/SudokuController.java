@@ -3,8 +3,12 @@ package com.mycompany.app.controllers;
 import com.mycompany.app.exceptions.*;
 import com.mycompany.app.models.*;
 import com.mycompany.app.controllers.services.*;
+import com.mycompany.app.controllers.services.solverServices.SudokuSolver;
+import com.mycompany.app.controllers.services.storageServices.GameGenerator;
+import com.mycompany.app.controllers.services.storageServices.StorageManager;
 import com.mycompany.app.utility.CSVReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,12 +16,18 @@ import java.util.List;
  * Implements Viewable interface and coordinates between model services.
  * Contains the core game logic.
  * 
+ * OBSERVER PATTERN:
+ * - This class is the Subject
+ * - GUI components are Observers (implement GameObserver interface)
+ * - Notifies observers when game state changes
+ * 
  * @author Menna
  */
 
 public class SudokuController implements Viewable {
     private final StorageManager storageManager;
     private final GameGenerator gameGenerator;
+    private final List<GameObserver> observers;
 
     private Game currentGame;
     private SudokuVerifier currentVerifier;
@@ -25,8 +35,73 @@ public class SudokuController implements Viewable {
     public SudokuController() {
         this.storageManager = new StorageManager();
         this.gameGenerator = new GameGenerator();
+        this.observers = new ArrayList<>();
         this.currentGame = null;
         this.currentVerifier = null;
+    }
+
+    /**
+     * Register an observer to receive notifications.
+     * 
+     * @param observer The GUI component to notify
+     */
+    public void addObserver(GameObserver observer) {
+        if (!observers.contains(observer)) {
+            observers.add(observer);
+        }
+    }
+
+    /**
+     * Unregister an observer.
+     * 
+     * @param observer The observer to remove
+     */
+    public void removeObserver(GameObserver observer) {
+        observers.remove(observer);
+    }
+
+    /**
+     * Notify all observers that a cell changed.
+     */
+    private void notifyCellChanged(int row, int col, int newValue) {
+        for (GameObserver observer : observers) {
+            observer.onCellChanged(row, col, newValue);
+        }
+    }
+
+    /**
+     * Notify all observers that an undo occurred.
+     */
+    private void notifyUndo(int row, int col, int restoredValue) {
+        for (GameObserver observer : observers) {
+            observer.onUndo(row, col, restoredValue);
+        }
+    }
+
+    /**
+     * Notify all observers of verification result.
+     */
+    private void notifyGameVerified(String result) {
+        for (GameObserver observer : observers) {
+            observer.onGameVerified(result);
+        }
+    }
+    /**
+     * Notify all observers that a new game loaded.
+     */
+    private void notifyNewGameLoaded(String difficulty) {
+        for (GameObserver observer : observers) {
+            observer.onNewGameLoaded(difficulty);
+        }
+    }
+
+    /**
+     * Notify all observers that game is completed.
+     */
+    private void notifyGameCompleted() {
+        for (GameObserver observer : observers) {
+            observer.onGameCompleted();
+        }
     }
 
     @Override
@@ -44,6 +119,9 @@ public class SudokuController implements Viewable {
             currentVerifier = new SudokuVerifier(game.board);
             storageManager.saveCurrentGame(game);
             storageManager.clearGameLog();
+
+            notifyNewGameLoaded(level.toString());
+
             return game;
         } catch (IOException e) {
             throw new NotFoundException("Failed to load game: " + e.getMessage());
@@ -75,7 +153,15 @@ public class SudokuController implements Viewable {
         if (currentGame != null && game.board == currentGame.board) {
             currentVerifier = verifier;
         }
-        return verifier.toString();
+        String result = verifier.toString();
+
+        notifyGameVerified(result);
+        // Check if game is completed
+        if (verifier.getState() == SudokuVerifier.State.VALID) {
+            notifyGameCompleted();
+        }
+
+        return result;
     }
 
     @Override
@@ -95,44 +181,85 @@ public class SudokuController implements Viewable {
         storageManager.logUserAction(userAction);
     }
 
-    public UserAction logAndUpdateCell(int x, int y, int newValue) throws IOException {
+    /**
+     * Updates a cell value (without UserAction - for internal use).
+     * Returns the previous value.
+     */
+    public int updateCellValue(int row, int col, int newValue) throws IOException {
         if (currentGame == null)
             throw new IllegalStateException("No game loaded");
-        if (!isValidCoordinate(x) || !isValidCoordinate(y)) {
+        if (!isValidCoordinate(row) || !isValidCoordinate(col)) {
             throw new IllegalArgumentException("Invalid coordinates");
         }
         if (!isValidValue(newValue)) {
             throw new IllegalArgumentException("Invalid value");
         }
 
-        int previousValue = currentGame.board[x][y];
-        UserAction action = new UserAction(x, y, newValue, previousValue);
-
-        currentGame.board[x][y] = newValue;
-        storageManager.logUserAction(action.toLogEntry());
+        int previousValue = currentGame.board[row][col];
+        currentGame.board[row][col] = newValue;
         currentVerifier = new SudokuVerifier(currentGame.board);
         storageManager.saveCurrentGame(currentGame);
 
-        return action;
-    }
-
-    public int updateCell(int row, int col, int value) throws IOException {
-        UserAction action = logAndUpdateCell(row, col, value);
-        return action.getPreviousValue();
-    }
-
-    public UserAction undoLastAction() throws IOException {
-        UserAction undoneAction = storageManager.undoLastAction();
-        if (undoneAction != null && currentGame != null) {
-            currentGame.board[undoneAction.getX()][undoneAction.getY()] = undoneAction.getPreviousValue();
-            currentVerifier = new SudokuVerifier(currentGame.board);
-            storageManager.saveCurrentGame(currentGame);
+        // Notify observers
+        notifyCellChanged(row, col, newValue);
+        String verificationResult = currentVerifier.toString();
+        notifyGameVerified(verificationResult);
+        if (currentVerifier.getState() == SudokuVerifier.State.VALID) {
+            notifyGameCompleted();
         }
-        return undoneAction;
+
+        return previousValue;
     }
 
-    public List<UserAction> readGameLog() throws IOException {
-        return storageManager.readUserActions();
+    /**
+     * Restores a cell to a previous value (without UserAction - for internal use).
+     */
+    public void restoreCellValue(int row, int col, int restoredValue) throws IOException {
+        if (currentGame == null)
+            throw new IllegalStateException("No game loaded");
+        
+        currentGame.board[row][col] = restoredValue;
+        currentVerifier = new SudokuVerifier(currentGame.board);
+        storageManager.saveCurrentGame(currentGame);
+
+        // Notify observers
+        notifyUndo(row, col, restoredValue);
+        String verificationResult = currentVerifier.toString();
+        notifyGameVerified(verificationResult);
+    }
+
+    /**
+     * Removes the last action from log and returns its log entry string.
+     */
+    public String removeLastActionFromLog() throws IOException {
+        List<String> logEntries = storageManager.readGameLog();
+        if (logEntries.isEmpty()) {
+            return null;
+        }
+        
+        String lastEntry = logEntries.remove(logEntries.size() - 1);
+        
+        // Rewrite log without last entry
+        storageManager.clearGameLog();
+        for (String entry : logEntries) {
+            storageManager.logUserAction(entry);
+        }
+        
+        return lastEntry;
+    }
+
+    /**
+     * Gets all log entries as strings.
+     */
+    public List<String> getAllLogEntries() throws IOException {
+        return storageManager.readGameLog();
+    }
+
+    /**
+     * Gets the current game board.
+     */
+    public int[][] getCurrentBoard() {
+        return (currentGame != null) ? currentGame.board : null;
     }
 
     public Game loadSolutionFromFile(String filePath) throws IOException {
@@ -142,10 +269,6 @@ public class SudokuController implements Viewable {
         } catch (NumberFormatException e) {
             throw new IOException("Invalid CSV format: " + e.getMessage());
         }
-    }
-
-    public int[][] getCurrentBoard() {
-        return (currentGame != null) ? currentGame.board : null;
     }
 
     public SudokuVerifier.State getCurrentGameState() {
@@ -181,27 +304,6 @@ public class SudokuController implements Viewable {
     public boolean shouldEnableSolveButton() {
         return getEmptyCellCount() == 5;
     }
-
-    // public int countEmptyCells(int[][] board) {
-    // int count = 0;
-    // for (int i = 0; i < 9; i++) {
-    // for (int j = 0; j < 9; j++) {
-    // if (board[i][j] == 0) count++;
-    // }
-    // }
-    // return count;
-    // }
-
-    // public int[] findEmptyCells(int[][] board) {
-    // int[] emptyCells = new int[countEmptyCells(board)];
-    // int index = 0;
-    // for (int i = 0; i < 9; i++) {
-    // for (int j = 0; j < 9; j++) {
-    // if (board[i][j] == 0) emptyCells[index++] = i * 9 + j;
-    // }
-    // }
-    // return emptyCells;
-    // }
 
     private boolean isValidCoordinate(int coord) {
         return coord >= 0 && coord < 9;

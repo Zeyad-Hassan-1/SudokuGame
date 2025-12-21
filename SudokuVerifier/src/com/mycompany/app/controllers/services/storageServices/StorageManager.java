@@ -1,9 +1,7 @@
-package com.mycompany.app.controllers.services;
-
+package com.mycompany.app.controllers.services.storageServices;
 
 import com.mycompany.app.models.DifficultyEnum;
 import com.mycompany.app.models.Game;
-import com.mycompany.app.models.UserAction;
 import com.mycompany.app.exceptions.NotFoundException;
 
 import java.io.*;
@@ -61,8 +59,6 @@ public class StorageManager {
         }
     }
     
-   
-    
     public boolean hasUnfinishedGame() {
         return new File(CURRENT_GAME_FILE).exists();
     }
@@ -71,13 +67,6 @@ public class StorageManager {
         return hasGamesInDirectory(EASY_DIR) && 
                hasGamesInDirectory(MEDIUM_DIR) && 
                hasGamesInDirectory(HARD_DIR);
-    }
-    
-    
-    
-    public int[][] loadGameBoard(DifficultyEnum level) throws NotFoundException, IOException {
-        Game game = getRandomGame(level);
-        return game.board;
     }
     
     public Game loadGame(DifficultyEnum level) throws NotFoundException, IOException {
@@ -91,16 +80,11 @@ public class StorageManager {
         writeGameToFile(game, filepath);
     }
     
-    public void saveGame(int[][] board, DifficultyEnum difficulty) throws IOException {
-        saveGame(new Game(board), difficulty);
-    }
-    
-    public Game getRandomGame(DifficultyEnum difficulty) throws NotFoundException, IOException {
+    private Game getRandomGame(DifficultyEnum difficulty) throws NotFoundException, IOException {
         String directory = getDirectoryForDifficulty(difficulty);
-        File dir = new File(directory);
-        File[] files = dir.listFiles((d, name) -> name.startsWith("game_") && name.endsWith(".csv"));
+        File[] files = getGameFiles(directory);
         
-        if (files == null || files.length == 0) {
+        if (files.length == 0) {
             throw new NotFoundException("No games found for difficulty: " + difficulty);
         }
         
@@ -108,51 +92,20 @@ public class StorageManager {
         return readGameFromFile(selectedFile.getAbsolutePath());
     }
     
-    
-    
     public void saveCurrentGame(Game game) throws IOException {
         clearIncompleteFolder();
         writeGameToFile(game, CURRENT_GAME_FILE);
-    }
-    
-    public void saveCurrentGame(int[][] board) throws IOException {
-        saveCurrentGame(new Game(board));
-    }
-    
-    public Game getCurrentGame() throws IOException {
-        File file = new File(CURRENT_GAME_FILE);
-        if (!file.exists()) return null;
-        return readGameFromFile(CURRENT_GAME_FILE);
-    }
-    
-    public int[][] getCurrentGameBoard() throws IOException {
-        Game game = getCurrentGame();
-        return (game != null) ? game.board : null;
-    }
-    
-    public boolean hasCurrentGame() {
-        return new File(CURRENT_GAME_FILE).exists();
-    }
-    
-    public void deleteCurrentGame() throws IOException {
-        clearIncompleteFolder();
     }
     
     public void deleteCurrentGameWithLog() throws IOException {
         clearIncompleteFolder();
     }
     
-    
-    
     public void logUserAction(String userAction) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(GAME_LOG_FILE, true))) {
             writer.write(userAction);
             writer.newLine();
         }
-    }
-    
-    public void logUserAction(UserAction action) throws IOException {
-        logUserAction(action.toLogEntry());
     }
     
     public List<String> readGameLog() throws IOException {
@@ -169,67 +122,12 @@ public class StorageManager {
         return actions;
     }
     
-    public List<UserAction> readUserActions() throws IOException {
-        List<String> logEntries = readGameLog();
-        List<UserAction> actions = new ArrayList<>();
-        
-        for (String entry : logEntries) {
-            try {
-                actions.add(UserAction.fromLogEntry(entry));
-            } catch (Exception e) {
-                System.err.println("Failed to parse: " + entry);
-            }
-        }
-        return actions;
-    }
-    
     public void clearGameLog() throws IOException {
         File logFile = new File(GAME_LOG_FILE);
         if (logFile.exists()) {
             Files.delete(logFile.toPath());
         }
     }
-    
-    public UserAction undoLastAction() throws IOException {
-        List<UserAction> actions = readUserActions();
-        if (actions.isEmpty()) return null;
-        
-        UserAction lastAction = actions.remove(actions.size() - 1);
-        
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(GAME_LOG_FILE))) {
-            for (UserAction action : actions) {
-                writer.write(action.toLogEntry());
-                writer.newLine();
-            }
-        }
-        return lastAction;
-    }
-    
-    
-    
-    public boolean allDifficultiesHaveGames() {
-        return hasGamesInDirectory(EASY_DIR) && 
-               hasGamesInDirectory(MEDIUM_DIR) && 
-               hasGamesInDirectory(HARD_DIR);
-    }
-    
-    public int getGameCount(DifficultyEnum difficulty) {
-        String directory = getDirectoryForDifficulty(difficulty);
-        File dir = new File(directory);
-        File[] files = dir.listFiles((d, name) -> name.startsWith("game_") && name.endsWith(".csv"));
-        return (files != null) ? files.length : 0;
-    }
-    
-    public void deleteGameFromFolder(DifficultyEnum difficulty, String filename) throws IOException {
-        String directory = getDirectoryForDifficulty(difficulty);
-        String filepath = directory + File.separator + filename;
-        File file = new File(filepath);
-        if (file.exists()) {
-            Files.delete(file.toPath());
-        }
-    }
-    
-    
     
     private String getDirectoryForDifficulty(DifficultyEnum difficulty) {
         switch (difficulty) {
@@ -241,18 +139,17 @@ public class StorageManager {
     }
     
     private String generateUniqueFilename(String directory) {
-        File dir = new File(directory);
-        File[] files = dir.listFiles((d, name) -> name.startsWith("game_") && name.endsWith(".csv"));
-        
+        File[] files = getGameFiles(directory);
         int maxNumber = 0;
-        if (files != null) {
-            for (File file : files) {
-                String name = file.getName();
-                try {
-                    String numberStr = name.substring(5, name.length() - 4);
-                    int number = Integer.parseInt(numberStr);
-                    maxNumber = Math.max(maxNumber, number);
-                } catch (Exception e) {}
+        
+        for (File file : files) {
+            String name = file.getName();
+            try {
+                String numberStr = name.substring(5, name.length() - 4);
+                int number = Integer.parseInt(numberStr);
+                maxNumber = Math.max(maxNumber, number);
+            } catch (Exception e) {
+                // Skip invalid filenames
             }
         }
         return "game_" + (maxNumber + 1) + ".csv";
@@ -296,10 +193,14 @@ public class StorageManager {
         return new Game(board);
     }
     
-    private boolean hasGamesInDirectory(String directory) {
+    private File[] getGameFiles(String directory) {
         File dir = new File(directory);
         File[] files = dir.listFiles((d, name) -> name.startsWith("game_") && name.endsWith(".csv"));
-        return files != null && files.length > 0;
+        return (files != null) ? files : new File[0];
+    }
+    
+    private boolean hasGamesInDirectory(String directory) {
+        return getGameFiles(directory).length > 0;
     }
     
     private void clearIncompleteFolder() throws IOException {
