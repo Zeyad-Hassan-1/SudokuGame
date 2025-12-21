@@ -55,7 +55,7 @@ public class ViewAdapter implements Controllable {
     @Override
     public boolean[][] verifyGame(int[][] board) {
         Game game = new Game(board);
-        String result = controller.verifyGame(game);// Returns "STATE|row,col|row,col|..."
+        String result = controller.verifyGame(game);
 
         boolean[][] verification = new boolean[9][9];
         for (int i = 0; i < 9; i++) {
@@ -99,28 +99,61 @@ public class ViewAdapter implements Controllable {
     @Override
     public int[][] solveGame(int[][] board) throws InvalidGame {
         Game game = new Game(board);
-        int[] solution = controller.solveGame(game);  // Returns [v1, v2, v3, v4, v5]
-        
+        int[] solution = controller.solveGame(game);
         int[] emptyPositions = game.findEmptyCells(board);
-        
         int[][] result = new int[5][3];
         
         for (int i = 0; i < 5; i++) {
             int encodedPosition = emptyPositions[i];
             int row = encodedPosition / 9;
             int col = encodedPosition % 9;
-            
             result[i][0] = row;
             result[i][1] = col;
-            result[i][2] = solution[i]; // ✓ solution value
+            result[i][2] = solution[i];
         }
         
-        return result;  // Returns [[x1,y1,val1], [x2,y2,val2], ...]
+        return result;
     }
 
     @Override
     public void logUserAction(UserAction userAction) throws IOException {
         controller.logUserAction(userAction.toLogEntry());
+    }
+
+    public UserAction logAndUpdateCell(int row, int col, int newValue) throws IOException {
+        if (!(controller instanceof SudokuController)) {
+            throw new IllegalStateException("Controller doesn't support cell updates");
+        }
+        SudokuController sudokuController = (SudokuController) controller;
+        
+        int previousValue = sudokuController.updateCellValue(row, col, newValue);
+        UserAction action = new UserAction(row, col, newValue, previousValue);
+        controller.logUserAction(action.toLogEntry());
+        
+        return action;
+    }
+
+    public UserAction undoLastAction() throws IOException {
+        if (!(controller instanceof SudokuController)) {
+            throw new IllegalStateException("Controller doesn't support undo");
+        }
+        SudokuController sudokuController = (SudokuController) controller;
+        
+        String lastEntry = sudokuController.removeLastActionFromLog();
+        if (lastEntry == null) {
+            return null;
+        }
+        
+        UserAction undoneAction = UserAction.fromLogEntry(lastEntry);
+        
+        // Restore the cell value
+        sudokuController.restoreCellValue(
+            undoneAction.getX(), 
+            undoneAction.getY(), 
+            undoneAction.getPreviousValue()
+        );
+        
+        return undoneAction;
     }
 
     private DifficultyEnum charToDifficulty(char level) {

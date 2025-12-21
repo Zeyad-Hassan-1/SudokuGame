@@ -1,4 +1,4 @@
-package com.mycompany.app.controllers.services;
+package com.mycompany.app.controllers.services.solverServices;
 
 import com.mycompany.app.exceptions.InvalidGame;
 import com.mycompany.app.models.Game;

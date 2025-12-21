@@ -1,4 +1,4 @@
-package com.mycompany.app.controllers.services;
+package com.mycompany.app.controllers.services.storageServices;
 
 import java.util.List;
 import com.mycompany.app.models.Game;
