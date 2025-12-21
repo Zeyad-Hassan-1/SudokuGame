@@ -7,6 +7,7 @@ package com.mycompany.app.controllers.services;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import com.mycompany.app.models.SudokuData;
 
@@ -21,7 +22,6 @@ public class SudokuVerifier {
     protected ArrayList<Duplicate> columnDuplicates;
     protected ArrayList<Duplicate> boxDuplicates;
     private State state;
-
 
     public SudokuVerifier(int[][] board) {
 
@@ -146,61 +146,132 @@ public class SudokuVerifier {
         }
     }
 
-
     /**
      * Gets the current state of the Sudoku board
+     * 
      * @return the State enum value (VALID, INVALID, or INCOMPLETE)
      */
     public State getState() {
         return state;
     }
 
-    private String duplicateMessage() {
+    /**
+     * Returns human-readable duplicate information for debugging/logging
+     * Used by Main.java for command-line output
+     */
+    private String duplicateMessageHumanReadable() {
         StringBuilder str = new StringBuilder();
         Collections.sort(rowDuplicates);
         Collections.sort(columnDuplicates);
         Collections.sort(boxDuplicates);
+
         for (Duplicate duplicate : rowDuplicates) {
             str.append(duplicate.toString());
             str.append("\n");
         }
         str.append("------------------------------------------\n");
+
         for (Duplicate duplicate : columnDuplicates) {
             str.append(duplicate.toString());
             str.append("\n");
         }
         str.append("------------------------------------------\n");
+
         for (Duplicate duplicate : boxDuplicates) {
             str.append(duplicate.toString());
             str.append("\n");
         }
+
         return str.toString();
+    }
+
+    /**
+     * Returns parseable duplicate cell positions for GUI
+     * Format: "row,col|row,col|..."
+     */
+    private String duplicateCellsParseable() {
+        StringBuilder result = new StringBuilder();
+        HashSet<String> invalidCells = new HashSet<>();
+
+        // Process row duplicates
+        for (Duplicate dup : rowDuplicates) {
+            int rowIdx = dup.getTypeIdx() - 1; // Convert to 0-based
+            for (Integer colPos : dup.getDuplicatesIdx()) {
+                int colIdx = colPos - 1; // Convert to 0-based
+                invalidCells.add(rowIdx + "," + colIdx);
+            }
+        }
+
+        // Process column duplicates
+        for (Duplicate dup : columnDuplicates) {
+            int colIdx = dup.getTypeIdx() - 1;
+            for (Integer rowPos : dup.getDuplicatesIdx()) {
+                int rowIdx = rowPos - 1;
+                invalidCells.add(rowIdx + "," + colIdx);
+            }
+        }
+
+        // Process box duplicates
+        for (Duplicate dup : boxDuplicates) {
+            int boxIdx = dup.getTypeIdx() - 1;
+            for (Integer posInBox : dup.getDuplicatesIdx()) {
+                int pos = posInBox - 1;
+                int boxRow = boxIdx / 3;
+                int boxCol = boxIdx % 3;
+                int rowIdx = boxRow * 3 + pos / 3;
+                int colIdx = boxCol * 3 + pos % 3;
+                invalidCells.add(rowIdx + "," + colIdx);
+            }
+        }
+
+        // Join all cells with |
+        for (String cell : invalidCells) {
+            result.append(cell).append("|");
+        }
+
+        return result.toString();
     }
 
     @Override
     public String toString() {
+        StringBuilder result = new StringBuilder();
+        result.append(state.toString()).append("|");
+
+        // Add parseable cell positions
+        if (!rowDuplicates.isEmpty() || !columnDuplicates.isEmpty() || !boxDuplicates.isEmpty()) {
+            result.append(duplicateCellsParseable());
+        }
+
+        return result.toString();
+    }
+
+    /**
+     * Returns human-readable verification result for console output
+     * Used by the command-line interface
+     */
+    public String toHumanReadableString() {
         switch (state) {
             case INCOMPLETE:
                 if (rowDuplicates.isEmpty() && columnDuplicates.isEmpty() && boxDuplicates.isEmpty()) {
                     return "\nINCOMPLETE WITH NO DUPLICATES";
                 } else {
-                    return "\nINCOMPLETE WITH DUPLICATES:\n" + duplicateMessage();
+                    return "\nINCOMPLETE WITH DUPLICATES:\n" + duplicateMessageHumanReadable();
                 }
             case INVALID:
-                return "\nINVALID\n" + duplicateMessage();
+                return "\nINVALID\n" + duplicateMessageHumanReadable();
             default:
                 return "\nVALID";
         }
-     }
+    }
 
     protected void verify() {
         // Initialize state to VALID, will be changed if issues are found
         state = State.VALID;
-        
+
         verifyRows();
         verifyColumns();
         verifyBoxes();
-        
+
         // If no duplicates found and board is complete, state remains VALID
         // Otherwise, state has been set to INCOMPLETE or INVALID during verification
     }

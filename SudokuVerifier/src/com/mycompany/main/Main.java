@@ -58,7 +58,7 @@ public class Main {
             
             int[][] board = CSVReader.readCSV(csvFile, allowZeros);
             SudokuVerifier verifier = new SudokuVerifier(board);
-            System.out.println(verifier.toString());
+            System.out.println(verifier.toHumanReadableString());
         }
         catch(Exception e)
         {
