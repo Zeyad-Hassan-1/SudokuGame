@@ -99,21 +99,23 @@ public class ViewAdapter implements Controllable {
     @Override
     public int[][] solveGame(int[][] board) throws InvalidGame {
         Game game = new Game(board);
-        int[] solution = controller.solveGame(game);
-
+        int[] solution = controller.solveGame(game);  // Returns [v1, v2, v3, v4, v5]
+        
+        int[] emptyPositions = game.findEmptyCells(board);
+        
         int[][] result = new int[5][3];
-        int index = 0;
-        for (int i = 0; i < 9 && index < 5; i++) {
-            for (int j = 0; j < 9 && index < 5; j++) {
-                if (board[i][j] == 0) {
-                    result[index][0] = i;
-                    result[index][1] = j;
-                    result[index][2] = solution[index];
-                    index++;
-                }
-            }
+        
+        for (int i = 0; i < 5; i++) {
+            int encodedPosition = emptyPositions[i];
+            int row = encodedPosition / 9;
+            int col = encodedPosition % 9;
+            
+            result[i][0] = row;
+            result[i][1] = col;
+            result[i][2] = solution[i]; // ✓ solution value
         }
-        return result;
+        
+        return result;  // Returns [[x1,y1,val1], [x2,y2,val2], ...]
     }
 
     @Override
