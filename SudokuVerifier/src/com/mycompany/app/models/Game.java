@@ -11,14 +11,13 @@ package com.mycompany.app.models;
  * @author Nour
  */
 public class Game {
-   int[][] board;
+   public int[][] board;
    private DifficultyEnum difficulty;
 
-   public Game(int[][] board, DifficultyEnum difficulty) {
+   public Game(int[][] board) {
       // IMPORTANT: DON'T COPY THE BOARD BY VALUE
       // USE REFERENCES
       this.board = board;
-      this.difficulty = difficulty;
    }
    // Add methods and attributes if needed
 
@@ -37,7 +36,8 @@ public class Game {
    public DifficultyEnum getDifficulty() {
       return difficulty;
    }
-   public int countEmptyCells() {
+
+   public int countEmptyCells(int[][] board) {
       int count = 0;
       for (int i = 0; i < 9; i++) {
          for (int j = 0; j < 9; j++) {
@@ -46,7 +46,18 @@ public class Game {
          }
       }
       return count;
-   
-}
+   }
+
+   public int[] findEmptyCells(int[][] board) {
+      int[] emptyCells = new int[countEmptyCells(board)];
+      int index = 0;
+      for (int i = 0; i < 9; i++) {
+         for (int j = 0; j < 9; j++) {
+            if (board[i][j] == 0)
+               emptyCells[index++] = i * 9 + j;
+         }
+      }
+      return emptyCells;
+   }
 
 }
