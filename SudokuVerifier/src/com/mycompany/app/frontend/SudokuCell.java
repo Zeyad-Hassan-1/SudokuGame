@@ -2,8 +2,8 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.mycompany.app.frontend.utils;
-import com.mycompany.main.GamePanel;
+package com.mycompany.app.frontend;
+import com.mycompany.app.frontend.GamePanel;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.FocusAdapter;
@@ -24,6 +24,7 @@ public class SudokuCell extends JTextField {
         this.parent = parent;
         this.row=row;
         this.col=col;
+        this.setOpaque(true);
         int top = (row % 3 == 0) ? 3 : 1;
         int left = (col % 3 == 0) ? 3 : 1;
         int bottom = (row == 8) ? 3 : ((row + 1) % 3 == 0 ? 3 : 1);

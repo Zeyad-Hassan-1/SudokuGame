@@ -1,8 +1,10 @@
+package com.mycompany.app.frontend;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
-package com.mycompany.main;
+
 
 import com.mycompany.app.exceptions.NotFoundException;
 import com.mycompany.app.exceptions.SolutionInvalidException;
@@ -18,17 +20,17 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 public class HomePanel extends javax.swing.JPanel {
 
     private MainFrame mainFrame;
+
     /**
      * Creates new form HomePanel
      */
     public HomePanel(MainFrame mainFrame) {
         initComponents();
-        this.mainFrame = mainFrame;        
+        this.mainFrame = mainFrame;
         btnEasy.setVisible(false);
         btnMedium.setVisible(false);
         btnHard.setVisible(false);
         btnGenerate.setVisible(false);
-        lblStatus.setText("Checking game status...");
     }
 
     /**
@@ -44,7 +46,6 @@ public class HomePanel extends javax.swing.JPanel {
         btnEasy = new javax.swing.JButton();
         btnMedium = new javax.swing.JButton();
         btnHard = new javax.swing.JButton();
-        lblStatus = new javax.swing.JLabel();
         btnGenerate = new javax.swing.JButton();
 
         setBackground(new java.awt.Color(255, 255, 255));
@@ -97,12 +98,6 @@ public class HomePanel extends javax.swing.JPanel {
             }
         });
 
-        lblStatus.setBackground(new java.awt.Color(255, 255, 255));
-        lblStatus.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
-        lblStatus.setForeground(new java.awt.Color(0, 0, 0));
-        lblStatus.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        lblStatus.setOpaque(true);
-
         btnGenerate.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         btnGenerate.setText("Generate");
         btnGenerate.addActionListener(new java.awt.event.ActionListener() {
@@ -117,17 +112,11 @@ public class HomePanel extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(logo)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(284, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(79, 79, 79)
-                        .addComponent(lblStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 416, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 105, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(94, 94, 94)
-                        .addComponent(btnGenerate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
+                .addGap(94, 94, 94)
+                .addComponent(btnGenerate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addComponent(btnMedium, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 578, Short.MAX_VALUE)
                     .addComponent(btnEasy, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -137,17 +126,12 @@ public class HomePanel extends javax.swing.JPanel {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(logo)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnEasy, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnMedium, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(33, 33, 33)))
+                .addComponent(logo)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnEasy, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(btnMedium, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnHard, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnGenerate, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -174,7 +158,7 @@ public class HomePanel extends javax.swing.JPanel {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Select Solved Sudoku CSV");
         fileChooser.setFileFilter(new FileNameExtensionFilter("CSV Files", "csv"));
-        
+
         int userSelection = fileChooser.showOpenDialog(this);
         if (userSelection == JFileChooser.APPROVE_OPTION) {
             File file = fileChooser.getSelectedFile();
@@ -194,40 +178,50 @@ public class HomePanel extends javax.swing.JPanel {
         boolean[] catalog = mainFrame.getAdapter().getCatalog();
         boolean hasUnfinished = catalog[0];
         boolean allModesExist = catalog[1];
+
         if (hasUnfinished) {
-            loadUnfinishedGame();
+            int choice = JOptionPane.showConfirmDialog(this,
+                    "An unfinished game exists. Do you want to Load it?",
+                    "Resume Game",
+                    JOptionPane.YES_NO_OPTION);
+
+            if (choice == JOptionPane.YES_OPTION) {
+                loadUnfinishedGame();
+            } else {
+                showDifficultyButtons();
+            }
         } else if (allModesExist) {
             showDifficultyButtons();
         } else {
             showGenerationScreen();
         }
     }
+
     private void loadUnfinishedGame() {
         try {
-            
+
             int[][] board = mainFrame.getAdapter().getUnfinishedGame();
             mainFrame.getGamePanel().setupGame(board);
             mainFrame.getCardLayout().show(mainFrame.getContentPane(), "game");
-        } catch (NotFoundException e){ 
+        } catch (NotFoundException e) {
             showDifficultyButtons();
         }
     }
-    
+
     private void showDifficultyButtons() {
         btnEasy.setVisible(true);
         btnMedium.setVisible(true);
         btnHard.setVisible(true);
         btnGenerate.setVisible(false);
     }
-    
+
     private void showGenerationScreen() {
-        lblStatus.setText("No games found. Please load a Solved Sudoku file to generate levels.");
         btnEasy.setVisible(false);
         btnMedium.setVisible(false);
         btnHard.setVisible(false);
         btnGenerate.setVisible(true);
     }
-    
+
     private void startGame(char level) {
         try {
             int[][] board = mainFrame.getAdapter().getGame(level);
@@ -243,7 +237,6 @@ public class HomePanel extends javax.swing.JPanel {
     private javax.swing.JButton btnGenerate;
     private javax.swing.JButton btnHard;
     private javax.swing.JButton btnMedium;
-    private javax.swing.JLabel lblStatus;
     private javax.swing.JLabel logo;
     // End of variables declaration//GEN-END:variables
 }

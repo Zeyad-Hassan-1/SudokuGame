@@ -93,7 +93,6 @@ public class StorageManager {
     }
     
     public void saveCurrentGame(Game game) throws IOException {
-        clearIncompleteFolder();
         writeGameToFile(game, CURRENT_GAME_FILE);
     }
     

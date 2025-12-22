@@ -2,10 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
-package com.mycompany.main;
+package com.mycompany.app.frontend;
 
 import com.mycompany.app.exceptions.InvalidGame;
-import com.mycompany.app.frontend.utils.SudokuCell;
 import com.mycompany.app.models.UserAction;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -150,6 +149,8 @@ public class GamePanel extends javax.swing.JPanel {
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
         showHome();
+        mainFrame.getCardLayout().show(mainFrame.getContentPane(), "home");
+        mainFrame.getHomePanel().processCatalog();
     }//GEN-LAST:event_btnBackActionPerformed
 
     private void btnVerifyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerifyActionPerformed
@@ -157,14 +158,16 @@ public class GamePanel extends javax.swing.JPanel {
             JOptionPane.showMessageDialog(this, "Please fill all cells before verifying.", "Incomplete", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        resetCellColors();
         boolean[][] verification = this.mainFrame.getAdapter().verifyGame(board);
         boolean allValid = colorCells(verification);
         if (allValid) {
             boolean processed = mainFrame.getController().handleGameCompletion();
             if (processed) {
-                JOptionPane.showMessageDialog(this, "Horaaaaaaay!! Congrats🎉\nGame Completed!", "Valid Solution!", JOptionPane.INFORMATION_MESSAGE);
-                showHome();
+                    JOptionPane.showMessageDialog(this,
+                            "Horaaaaaaay!! Congrats🎉\nGame Completed!",
+                            "Valid Solution!",
+                            JOptionPane.INFORMATION_MESSAGE);
+                    showHome();
             }
         } else {
             JOptionPane.showMessageDialog(this, "Some cells are incorrect (marked in red).", "Invalid Solution", JOptionPane.ERROR_MESSAGE);
@@ -172,13 +175,18 @@ public class GamePanel extends javax.swing.JPanel {
     }//GEN-LAST:event_btnVerifyActionPerformed
 
     private void btnUndoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUndoActionPerformed
+        this.requestFocusInWindow();
         try {
             UserAction action = mainFrame.getAdapter().undoLastAction();
             if (action != null) {
                 int r = action.getX();
                 int c = action.getY();
                 int prevVal = action.getPreviousValue();
+
+                // Update internal board
                 board[r][c] = prevVal;
+
+                // Update GUI safely
                 SwingUtilities.invokeLater(() -> {
                     String text = (prevVal == 0) ? "" : String.valueOf(prevVal);
                     cells[r][c].setText(text);
@@ -219,14 +227,6 @@ public class GamePanel extends javax.swing.JPanel {
         return mainFrame.getController().getEmptyCellCount();
     }
 
-    private void resetCellColors() {
-        for (int row = 0; row < 9; row++) {
-            for (int col = 0; col < 9; col++) {
-                cells[row][col].setBackground(Color.WHITE);
-            }
-        }
-    }
-
     private boolean colorCells(boolean[][] isValid) {
         boolean allValid = true;
         for (int row = 0; row < 9; row++) {
@@ -242,7 +242,6 @@ public class GamePanel extends javax.swing.JPanel {
     }
 
     public void notifyCellChange(int row, int col, int value) {
-        board[row][col] = value;
         try {
             mainFrame.getAdapter().logAndUpdateCell(row, col, value);
         } catch (IOException ex) {
@@ -253,7 +252,6 @@ public class GamePanel extends javax.swing.JPanel {
     public void setupGame(int[][] newBoard) {
         this.board = newBoard;
         refreshGridUI();
-        resetCellColors();
         cellPanel.setVisible(true);
     }
 
@@ -262,9 +260,12 @@ public class GamePanel extends javax.swing.JPanel {
             for (int col = 0; col < 9; col++) {
                 int val = board[row][col];
                 if (val == 0) {
+                    cells[row][col].setBackground(new Color(232, 240, 254));
                     cells[row][col].setText("");
                     cells[row][col].setEditable(true);
+                    
                 } else {
+                    cells[row][col].setBackground(Color.white);
                     cells[row][col].setText(String.valueOf(val));
                 }
             }
@@ -281,6 +282,7 @@ public class GamePanel extends javax.swing.JPanel {
                 SudokuCell cell = new SudokuCell(row, col, this);
                 cells[row][col] = cell;
                 cellPanel.add(cell);
+                cells[row][col].setBackground(Color.white);
             }
         }
 

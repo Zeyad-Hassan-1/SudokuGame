@@ -45,10 +45,10 @@ public class SudokuController implements Viewable {
     }
 
     @Override
-    public Game getUnfinishedGame() throws NotFoundException
+    public Game getUnfinishedGame() throws NotFoundException 
     {
         try{
-            Game game = storageManager.readGameFromFile(storageManager.CURRENT_GAME_FILE);
+            Game game = storageManager.readGameFromFile(StorageManager.CURRENT_GAME_FILE);
             currentGame = game;
             currentVerifier = new SudokuVerifier(game.board);
             
@@ -64,8 +64,8 @@ public class SudokuController implements Viewable {
             Game game = storageManager.loadGame(level);
             currentGame = game;
             currentVerifier = new SudokuVerifier(game.board);
+            storageManager.deleteCurrentGameWithLog();
             storageManager.saveCurrentGame(game);
-            storageManager.clearGameLog();
 
             return game;
         } catch (IOException e) {

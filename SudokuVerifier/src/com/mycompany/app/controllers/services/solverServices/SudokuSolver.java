@@ -69,7 +69,23 @@ public class SudokuSolver {
             });
         }
 
-        executor.shutdownNow(); // Clean up everything
+        // Stop accepting new tasks
+        executor.shutdown();
+        
+        // Wait until solution found or all tasks complete
+        while (!foundFlag[0] && !executor.isTerminated()) {
+            try {
+                executor.awaitTermination(10, java.util.concurrent.TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
+        
+        // Cancel remaining tasks once solution is found
+        if (foundFlag[0]) {
+            executor.shutdownNow();
+        }
 
         if (solutionWrapper[0] == null) {
             throw new InvalidGame("No valid solution exists");

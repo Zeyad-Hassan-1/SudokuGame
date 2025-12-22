@@ -1,4 +1,6 @@
-package com.mycompany.main;
+package com.mycompany.app.frontend;
+
+
 
 
 import com.mycompany.app.controllers.SudokuController;
@@ -24,13 +26,16 @@ public class MainFrame extends javax.swing.JFrame {
     private final CardLayout cardLayout;
     private final HomePanel homePanel;
     private final GamePanel gamePanel;
-    private final SudokuController controller = new SudokuController();
-    private final ViewAdapter adapter = new ViewAdapter(controller);
+    private final SudokuController controller;
+    private final ViewAdapter adapter;
     private final Dimension dimension = new Dimension(1280,720);
     /**
      * Creates new form MainFrame
+     * @param controller
      */
-    public MainFrame() {
+    public MainFrame(SudokuController controller) {
+        this.controller = controller;
+        this.adapter = new ViewAdapter(controller);
         initComponents();
         setTitle("Sudoku Game");
         setSize(1280,720);
@@ -81,31 +86,6 @@ public class MainFrame extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new MainFrame().setVisible(true));
-    }
     
     public CardLayout getCardLayout()
     {
