@@ -25,6 +25,9 @@ public class GamePanel extends javax.swing.JPanel {
     /**
      * Creates new form GamePanel
      * @param mainFrame
+     */    /**
+     * Creates new form GamePanel
+     * @param mainFrame
      */
     public GamePanel(MainFrame mainFrame) {
         initComponents();
@@ -32,32 +35,7 @@ public class GamePanel extends javax.swing.JPanel {
         setMaximumSize(new Dimension(1920,1080));
         setMinimumSize(mainFrame.getDimension());
         setPreferredSize(mainFrame.getDimension());
-        int cellPanelWidth= (int)((mainFrame.getDimension().width)*0.9);
-        int cellPanelHeight= (int)((mainFrame.getDimension().height)*0.8);
-        cellPanel.setPreferredSize(new Dimension(cellPanelWidth,cellPanelHeight));
-        for(int row =0;row<9;row++)
-        {
-            for(int col =0;col<9;col++)
-            {
-                cells[row][col] = new JTextField();
-                int top = (row % 3 == 0) ? 3 : 1;
-                int left = (col % 3 == 0) ? 3 : 1;
-                int bottom = (row == 8) ? 3 : ((row + 1) % 3 == 0 ? 3 : 1);
-                int right = (col == 8) ? 3 : ((col + 1) % 3 == 0 ? 3 : 1);
-                cells[row][col].setBorder(BorderFactory.createMatteBorder( top, left, bottom, right, Color.BLACK ));
-                cells[row][col].setHorizontalAlignment(JTextField.CENTER);
-                cells[row][col].setFont(new Font("Arial", Font.BOLD, 36));
-                cells[row][col].setText("0");
-                cellPanel.add(cells[row][col]);
-            }
-        }
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.anchor = GridBagConstraints.CENTER;
-        add(cellPanel, gbc);
+        initCells();
         cellPanel.setVisible(true);
     }
 
@@ -181,7 +159,77 @@ public class GamePanel extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_btnSolveActionPerformed
 
+    private void cellsActionPerformed(java.awt.event.ActionEvent evt,JTextField cell) {                                            
+        // TODO add your handling code here:
+        String field = cell.getText();
+        if(field.length()>0)
+        {
+            try
+            {
+                int val = Integer.parseInt(field);
+                if(val<1||val>9)
+                    cell.setText("");
+            }catch(Exception e)
+            {
+                cell.setText("");
+            }
+        }
+    } 
+    private void cellsFocusLost(java.awt.event.FocusEvent evt,JTextField cell) {                                      
+        // TODO add your handling code here:
+        String field = cell.getText();
+        if(field.length()>0)
+        {
+            try
+            {
+                int val = Integer.parseInt(field);
+                if(val<1||val>9)
+                    cell.setText("");
+            }catch(Exception e)
+            {
+                cell.setText("");
+            }
+        }
+    }                                     
 
+    private void initCells()
+    {
+        int cellPanelWidth= (int)((mainFrame.getDimension().width)*0.9);
+        int cellPanelHeight= (int)((mainFrame.getDimension().height)*0.8);
+        cellPanel.setPreferredSize(new Dimension(cellPanelWidth,cellPanelHeight));
+        for(int row =0;row<9;row++)
+        {
+            for(int col =0;col<9;col++)
+            {
+                JTextField cell = new JTextField();
+                int top = (row % 3 == 0) ? 3 : 1;
+                int left = (col % 3 == 0) ? 3 : 1;
+                int bottom = (row == 8) ? 3 : ((row + 1) % 3 == 0 ? 3 : 1);
+                int right = (col == 8) ? 3 : ((col + 1) % 3 == 0 ? 3 : 1);
+                cell.setBorder(BorderFactory.createMatteBorder( top, left, bottom, right, Color.BLACK ));
+                cell.setHorizontalAlignment(JTextField.CENTER);
+                cell.setFont(new Font("Arial", Font.BOLD, 36));
+                cell.setText("");
+                cell.addActionListener(evt -> cellsActionPerformed(evt, cell));
+                cell.addFocusListener(new java.awt.event.FocusAdapter() {
+                    @Override
+                    public void focusLost(java.awt.event.FocusEvent evt) {
+                        cellsFocusLost(evt, cell);
+                    }
+                });
+                cells[row][col] = cell;
+                cellPanel.add(cell);
+            }
+        }
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.anchor = GridBagConstraints.CENTER;
+        add(cellPanel, gbc);
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBack;
     private javax.swing.JButton btnSolve;
