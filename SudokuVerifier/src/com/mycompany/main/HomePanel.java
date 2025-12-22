@@ -4,6 +4,13 @@
  */
 package com.mycompany.main;
 
+import com.mycompany.app.exceptions.NotFoundException;
+import com.mycompany.app.exceptions.SolutionInvalidException;
+import java.io.File;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
 /**
  *
  * @author Hazem
@@ -15,8 +22,13 @@ public class HomePanel extends javax.swing.JPanel {
      * Creates new form HomePanel
      */
     public HomePanel(MainFrame mainFrame) {
-        this.mainFrame = mainFrame;
         initComponents();
+        this.mainFrame = mainFrame;        
+        btnEasy.setVisible(false);
+        btnMedium.setVisible(false);
+        btnHard.setVisible(false);
+        btnGenerate.setVisible(false);
+        lblStatus.setText("Checking game status...");
     }
 
     /**
@@ -31,7 +43,9 @@ public class HomePanel extends javax.swing.JPanel {
         logo = new javax.swing.JLabel();
         btnEasy = new javax.swing.JButton();
         btnMedium = new javax.swing.JButton();
-        btnEasy2 = new javax.swing.JButton();
+        btnHard = new javax.swing.JButton();
+        lblStatus = new javax.swing.JLabel();
+        btnGenerate = new javax.swing.JButton();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setForeground(new java.awt.Color(0, 0, 0));
@@ -39,12 +53,12 @@ public class HomePanel extends javax.swing.JPanel {
         setMinimumSize(new java.awt.Dimension(1280, 720));
         setPreferredSize(new java.awt.Dimension(1280, 720));
 
-        logo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/LOGO.png"))); // NOI18N
+        logo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/mycompany/main/resources/LOGO.png"))); // NOI18N
 
         btnEasy.setBackground(new java.awt.Color(255, 255, 255));
         btnEasy.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
         btnEasy.setForeground(new java.awt.Color(153, 0, 0));
-        btnEasy.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/arrow.jpg"))); // NOI18N
+        btnEasy.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/mycompany/main/resources/arrow.jpg"))); // NOI18N
         btnEasy.setText("Easy");
         btnEasy.setBorder(null);
         btnEasy.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
@@ -58,7 +72,7 @@ public class HomePanel extends javax.swing.JPanel {
         btnMedium.setBackground(new java.awt.Color(255, 255, 255));
         btnMedium.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
         btnMedium.setForeground(new java.awt.Color(153, 0, 0));
-        btnMedium.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/arrow.jpg"))); // NOI18N
+        btnMedium.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/mycompany/main/resources/arrow.jpg"))); // NOI18N
         btnMedium.setText("Medium");
         btnMedium.setBorder(null);
         btnMedium.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
@@ -69,17 +83,31 @@ public class HomePanel extends javax.swing.JPanel {
             }
         });
 
-        btnEasy2.setBackground(new java.awt.Color(255, 255, 255));
-        btnEasy2.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
-        btnEasy2.setForeground(new java.awt.Color(153, 0, 0));
-        btnEasy2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/arrow.jpg"))); // NOI18N
-        btnEasy2.setText("Hard");
-        btnEasy2.setBorder(null);
-        btnEasy2.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        btnEasy2.setIconTextGap(0);
-        btnEasy2.addActionListener(new java.awt.event.ActionListener() {
+        btnHard.setBackground(new java.awt.Color(255, 255, 255));
+        btnHard.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
+        btnHard.setForeground(new java.awt.Color(153, 0, 0));
+        btnHard.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/mycompany/main/resources/arrow.jpg"))); // NOI18N
+        btnHard.setText("Hard");
+        btnHard.setBorder(null);
+        btnHard.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        btnHard.setIconTextGap(0);
+        btnHard.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnEasy2ActionPerformed(evt);
+                btnHardActionPerformed(evt);
+            }
+        });
+
+        lblStatus.setBackground(new java.awt.Color(255, 255, 255));
+        lblStatus.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
+        lblStatus.setForeground(new java.awt.Color(0, 0, 0));
+        lblStatus.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        lblStatus.setOpaque(true);
+
+        btnGenerate.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
+        btnGenerate.setText("Generate");
+        btnGenerate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGenerateActionPerformed(evt);
             }
         });
 
@@ -89,46 +117,133 @@ public class HomePanel extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(logo)
-                .addContainerGap(284, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(79, 79, 79)
+                        .addComponent(lblStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 416, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 105, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(94, 94, 94)
+                        .addComponent(btnGenerate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addComponent(btnMedium, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 578, Short.MAX_VALUE)
                     .addComponent(btnEasy, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnEasy2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(btnHard, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(102, 102, 102))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(logo)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnEasy, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(btnMedium, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(btnEasy2, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(logo)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnEasy, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnMedium, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(33, 33, 33)))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnHard, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnGenerate, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(66, 66, 66))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnEasyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEasyActionPerformed
         // TODO add your handling code here:
+        startGame('E');
     }//GEN-LAST:event_btnEasyActionPerformed
 
     private void btnMediumActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMediumActionPerformed
         // TODO add your handling code here:
+        startGame('M');
     }//GEN-LAST:event_btnMediumActionPerformed
 
-    private void btnEasy2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEasy2ActionPerformed
+    private void btnHardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHardActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_btnEasy2ActionPerformed
+        startGame('H');
+    }//GEN-LAST:event_btnHardActionPerformed
 
+    private void btnGenerateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerateActionPerformed
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Select Solved Sudoku CSV");
+        fileChooser.setFileFilter(new FileNameExtensionFilter("CSV Files", "csv"));
+        
+        int userSelection = fileChooser.showOpenDialog(this);
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+            try {
+                // Call Adapter to drive games
+                mainFrame.getAdapter().driveGames(file.getAbsolutePath());
+                JOptionPane.showMessageDialog(this, "Games generated successfully!");
+                // Now show the buttons
+                showDifficultyButtons();
+            } catch (SolutionInvalidException ex) {
+                JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Generation Failed", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_btnGenerateActionPerformed
+
+    public void processCatalog() {
+        boolean[] catalog = mainFrame.getAdapter().getCatalog();
+        boolean hasUnfinished = catalog[0];
+        boolean allModesExist = catalog[1];
+        if (hasUnfinished) {
+            loadUnfinishedGame();
+        } else if (allModesExist) {
+            showDifficultyButtons();
+        } else {
+            showGenerationScreen();
+        }
+    }
+    private void loadUnfinishedGame() {
+        try {
+            
+            int[][] board = mainFrame.getAdapter().getUnfinishedGame();
+            mainFrame.getGamePanel().setupGame(board);
+            mainFrame.getCardLayout().show(mainFrame.getContentPane(), "game");
+        } catch (NotFoundException e){ 
+            showDifficultyButtons();
+        }
+    }
+    
+    private void showDifficultyButtons() {
+        btnEasy.setVisible(true);
+        btnMedium.setVisible(true);
+        btnHard.setVisible(true);
+        btnGenerate.setVisible(false);
+    }
+    
+    private void showGenerationScreen() {
+        lblStatus.setText("No games found. Please load a Solved Sudoku file to generate levels.");
+        btnEasy.setVisible(false);
+        btnMedium.setVisible(false);
+        btnHard.setVisible(false);
+        btnGenerate.setVisible(true);
+    }
+    
+    private void startGame(char level) {
+        try {
+            int[][] board = mainFrame.getAdapter().getGame(level);
+            mainFrame.getGamePanel().setupGame(board);
+            mainFrame.getCardLayout().show(mainFrame.getContentPane(), "game");
+        } catch (NotFoundException ex) {
+            JOptionPane.showMessageDialog(this, "Game file not found.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnEasy;
-    private javax.swing.JButton btnEasy2;
+    private javax.swing.JButton btnGenerate;
+    private javax.swing.JButton btnHard;
     private javax.swing.JButton btnMedium;
+    private javax.swing.JLabel lblStatus;
     private javax.swing.JLabel logo;
     // End of variables declaration//GEN-END:variables
 }

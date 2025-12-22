@@ -12,7 +12,9 @@ import java.io.IOException;
  */
 public interface Controllable {
     boolean[] getCatalog();
-
+    
+    int[][] getUnfinishedGame() throws NotFoundException;
+    
     int[][] getGame(char level) throws NotFoundException;
 
     void driveGames(String sourcePath) throws SolutionInvalidException;

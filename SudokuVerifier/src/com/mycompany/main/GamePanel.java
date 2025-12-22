@@ -4,14 +4,17 @@
  */
 package com.mycompany.main;
 
+import com.mycompany.app.exceptions.InvalidGame;
+import com.mycompany.app.frontend.utils.SudokuCell;
+import com.mycompany.app.models.UserAction;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridLayout;
-import javax.swing.BorderFactory;
+import java.io.IOException;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -19,23 +22,23 @@ import javax.swing.JTextField;
  */
 public class GamePanel extends javax.swing.JPanel {
 
-    private MainFrame mainFrame;
-    private JTextField[][] cells = new JTextField[9][9];
-    private JPanel cellPanel = new JPanel(new GridLayout(9,9,2,2));
+    private final MainFrame mainFrame;
+    private final SudokuCell[][] cells = new SudokuCell[9][9];
+    private final JPanel cellPanel = new JPanel(new GridLayout(9, 9, 2, 2));
+    private int[][] board;
+
     /**
      * Creates new form GamePanel
-     * @param mainFrame
-     */    /**
-     * Creates new form GamePanel
+     *
      * @param mainFrame
      */
     public GamePanel(MainFrame mainFrame) {
         initComponents();
         this.mainFrame = mainFrame;
-        setMaximumSize(new Dimension(1920,1080));
+        setMaximumSize(new Dimension(1920, 1080));
         setMinimumSize(mainFrame.getDimension());
         setPreferredSize(mainFrame.getDimension());
-        initCells();
+        initGridStructure();
         cellPanel.setVisible(true);
     }
 
@@ -82,6 +85,7 @@ public class GamePanel extends javax.swing.JPanel {
         btnVerify.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         btnVerify.setForeground(new java.awt.Color(0, 0, 0));
         btnVerify.setText("Verify");
+        btnVerify.setToolTipText("disabled unless the number of remaining empty cells is exactly 0");
         btnVerify.setOpaque(true);
         btnVerify.setPreferredSize(new java.awt.Dimension(90, 40));
         btnVerify.addActionListener(new java.awt.event.ActionListener() {
@@ -118,6 +122,7 @@ public class GamePanel extends javax.swing.JPanel {
         btnSolve.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         btnSolve.setForeground(new java.awt.Color(0, 0, 0));
         btnSolve.setText("Solve");
+        btnSolve.setToolTipText("disabled unless the number of remaining empty cells is exactly 5");
         btnSolve.setOpaque(true);
         btnSolve.setPreferredSize(new java.awt.Dimension(90, 40));
         btnSolve.addActionListener(new java.awt.event.ActionListener() {
@@ -144,83 +149,141 @@ public class GamePanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
-        // TODO add your handling code here:
+        showHome();
     }//GEN-LAST:event_btnBackActionPerformed
 
     private void btnVerifyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerifyActionPerformed
-        // TODO add your handling code here:
+        if (countEmptyCells() > 0) {
+            JOptionPane.showMessageDialog(this, "Please fill all cells before verifying.", "Incomplete", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        resetCellColors();
+        boolean[][] verification = this.mainFrame.getAdapter().verifyGame(board);
+        boolean allValid = colorCells(verification);
+        if (allValid) {
+            boolean processed = mainFrame.getController().handleGameCompletion();
+            if (processed) {
+                JOptionPane.showMessageDialog(this, "Horaaaaaaay!! Congrats🎉\nGame Completed!", "Valid Solution!", JOptionPane.INFORMATION_MESSAGE);
+                showHome();
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Some cells are incorrect (marked in red).", "Invalid Solution", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnVerifyActionPerformed
 
     private void btnUndoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUndoActionPerformed
-        // TODO add your handling code here:
+        try {
+            UserAction action = mainFrame.getAdapter().undoLastAction();
+            if (action != null) {
+                int r = action.getX();
+                int c = action.getY();
+                int prevVal = action.getPreviousValue();
+                board[r][c] = prevVal;
+                SwingUtilities.invokeLater(() -> {
+                    String text = (prevVal == 0) ? "" : String.valueOf(prevVal);
+                    cells[r][c].setText(text);
+                });
+            } else {
+                JOptionPane.showMessageDialog(this, "Nothing to undo!", "Info", JOptionPane.INFORMATION_MESSAGE);
+            }
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, "Error undoing action: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnUndoActionPerformed
 
     private void btnSolveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolveActionPerformed
-        // TODO add your handling code here:
+        if (countEmptyCells() != 5) {
+            JOptionPane.showMessageDialog(this, "Solver only works when exactly 5 cells are empty.", "Solver Constraint", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        try {
+            int[][] solutionSteps = mainFrame.getAdapter().solveGame(board);
+
+            for (int[] step : solutionSteps) {
+                int r = step[0];
+                int c = step[1];
+                int val = step[2];
+                board[r][c] = val;
+                cells[r][c].setText(String.valueOf(val));
+                mainFrame.getAdapter().logAndUpdateCell(r, c, val);
+            }
+        } catch (InvalidGame ex) {
+            JOptionPane.showMessageDialog(this, "Cannot solve this game state.", "Solver Error", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error solving game: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnSolveActionPerformed
 
-    private void cellsActionPerformed(java.awt.event.ActionEvent evt,JTextField cell) {                                            
-        // TODO add your handling code here:
-        String field = cell.getText();
-        if(field.length()>0)
-        {
-            try
-            {
-                int val = Integer.parseInt(field);
-                if(val<1||val>9)
-                    cell.setText("");
-            }catch(Exception e)
-            {
-                cell.setText("");
-            }
-        }
-    } 
-    private void cellsFocusLost(java.awt.event.FocusEvent evt,JTextField cell) {                                      
-        // TODO add your handling code here:
-        String field = cell.getText();
-        if(field.length()>0)
-        {
-            try
-            {
-                int val = Integer.parseInt(field);
-                if(val<1||val>9)
-                    cell.setText("");
-            }catch(Exception e)
-            {
-                cell.setText("");
-            }
-        }
-    }                                     
+    private int countEmptyCells() {
+        return mainFrame.getController().getEmptyCellCount();
+    }
 
-    private void initCells()
-    {
-        int cellPanelWidth= (int)((mainFrame.getDimension().width)*0.9);
-        int cellPanelHeight= (int)((mainFrame.getDimension().height)*0.8);
-        cellPanel.setPreferredSize(new Dimension(cellPanelWidth,cellPanelHeight));
-        for(int row =0;row<9;row++)
-        {
-            for(int col =0;col<9;col++)
-            {
-                JTextField cell = new JTextField();
-                int top = (row % 3 == 0) ? 3 : 1;
-                int left = (col % 3 == 0) ? 3 : 1;
-                int bottom = (row == 8) ? 3 : ((row + 1) % 3 == 0 ? 3 : 1);
-                int right = (col == 8) ? 3 : ((col + 1) % 3 == 0 ? 3 : 1);
-                cell.setBorder(BorderFactory.createMatteBorder( top, left, bottom, right, Color.BLACK ));
-                cell.setHorizontalAlignment(JTextField.CENTER);
-                cell.setFont(new Font("Arial", Font.BOLD, 36));
-                cell.setText("");
-                cell.addActionListener(evt -> cellsActionPerformed(evt, cell));
-                cell.addFocusListener(new java.awt.event.FocusAdapter() {
-                    @Override
-                    public void focusLost(java.awt.event.FocusEvent evt) {
-                        cellsFocusLost(evt, cell);
-                    }
-                });
+    private void resetCellColors() {
+        for (int row = 0; row < 9; row++) {
+            for (int col = 0; col < 9; col++) {
+                cells[row][col].setBackground(Color.WHITE);
+            }
+        }
+    }
+
+    private boolean colorCells(boolean[][] isValid) {
+        boolean allValid = true;
+        for (int row = 0; row < 9; row++) {
+            // Fixed loop condition (was col < 0)
+            for (int col = 0; col < 9; col++) {
+                if (!isValid[row][col]) {
+                    allValid = false;
+                    cells[row][col].setBackground(new Color(255, 100, 100)); // Light Red
+                }
+            }
+        }
+        return allValid;
+    }
+
+    public void notifyCellChange(int row, int col, int value) {
+        board[row][col] = value;
+        try {
+            mainFrame.getAdapter().logAndUpdateCell(row, col, value);
+        } catch (IOException ex) {
+            System.err.println("Failed to log cell change: " + ex.getMessage());
+        }
+    }
+
+    public void setupGame(int[][] newBoard) {
+        this.board = newBoard;
+        refreshGridUI();
+        resetCellColors();
+        cellPanel.setVisible(true);
+    }
+
+    private void refreshGridUI() {
+        for (int row = 0; row < 9; row++) {
+            for (int col = 0; col < 9; col++) {
+                int val = board[row][col];
+                if (val == 0) {
+                    cells[row][col].setText("");
+                    cells[row][col].setEditable(true);
+                } else {
+                    cells[row][col].setText(String.valueOf(val));
+                }
+            }
+        }
+    }
+
+    private void initGridStructure() {
+        int cellPanelWidth = (int) ((mainFrame.getDimension().width) * 0.9);
+        int cellPanelHeight = (int) ((mainFrame.getDimension().height) * 0.8);
+        cellPanel.setPreferredSize(new Dimension(cellPanelWidth, cellPanelHeight));
+
+        for (int row = 0; row < 9; row++) {
+            for (int col = 0; col < 9; col++) {
+                SudokuCell cell = new SudokuCell(row, col, this);
                 cells[row][col] = cell;
                 cellPanel.add(cell);
             }
         }
+
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -229,7 +292,11 @@ public class GamePanel extends javax.swing.JPanel {
         gbc.anchor = GridBagConstraints.CENTER;
         add(cellPanel, gbc);
     }
-    
+
+    private void showHome() {
+        mainFrame.getCardLayout().show(mainFrame.getContentPane(), "home");
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBack;
     private javax.swing.JButton btnSolve;

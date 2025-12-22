@@ -7,6 +7,7 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -49,8 +50,11 @@ public class MainFrame extends javax.swing.JFrame {
        gamePanel = new GamePanel(this);
        add(gamePanel,"game");
        
-       cardLayout.show(getContentPane(), "game");
+       cardLayout.show(getContentPane(), "home");
        setVisible(true);
+       SwingUtilities.invokeLater(() -> {
+            homePanel.processCatalog();
+        });
     }
 
     /**
@@ -122,6 +126,16 @@ public class MainFrame extends javax.swing.JFrame {
     {
         return this.dimension;
     }
+
+    public SudokuController getController() {
+        return controller;
+    }
+
+    public ViewAdapter getAdapter() {
+        return adapter;
+    }
+    
+    
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables

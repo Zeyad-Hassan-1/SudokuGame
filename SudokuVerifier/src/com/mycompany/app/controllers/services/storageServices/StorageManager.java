@@ -32,14 +32,14 @@ import java.util.Random;
 
 
 public class StorageManager {
-    private static final String BASE_STORAGE_DIR = "storage";
-    private static final String EASY_DIR = BASE_STORAGE_DIR + File.separator + "easy";
-    private static final String MEDIUM_DIR = BASE_STORAGE_DIR + File.separator + "medium";
-    private static final String HARD_DIR = BASE_STORAGE_DIR + File.separator + "hard";
-    private static final String INCOMPLETE_DIR = BASE_STORAGE_DIR + File.separator + "incomplete";
+    public static final String BASE_STORAGE_DIR = "storage";
+    public static final String EASY_DIR = BASE_STORAGE_DIR + File.separator + "easy";
+    public static final String MEDIUM_DIR = BASE_STORAGE_DIR + File.separator + "medium";
+    public static final String HARD_DIR = BASE_STORAGE_DIR + File.separator + "hard";
+    public static final String INCOMPLETE_DIR = BASE_STORAGE_DIR + File.separator + "incomplete";
     
-    private static final String CURRENT_GAME_FILE = INCOMPLETE_DIR + File.separator + "current_game.csv";
-    private static final String GAME_LOG_FILE = INCOMPLETE_DIR + File.separator + "gameLog.txt";
+    public static final String CURRENT_GAME_FILE = INCOMPLETE_DIR + File.separator + "current_game.csv";
+    public static final String GAME_LOG_FILE = INCOMPLETE_DIR + File.separator + "gameLog.txt";
     
     private final Random random;
     
@@ -169,7 +169,7 @@ public class StorageManager {
         }
     }
     
-    private Game readGameFromFile(String filepath) throws IOException {
+    public Game readGameFromFile(String filepath) throws IOException {
         int[][] board = new int[9][9];
         try (BufferedReader reader = new BufferedReader(new FileReader(filepath))) {
             String line;

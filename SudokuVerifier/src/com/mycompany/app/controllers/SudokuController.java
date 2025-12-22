@@ -45,6 +45,20 @@ public class SudokuController implements Viewable {
     }
 
     @Override
+    public Game getUnfinishedGame() throws NotFoundException
+    {
+        try{
+            Game game = storageManager.readGameFromFile(storageManager.CURRENT_GAME_FILE);
+            currentGame = game;
+            currentVerifier = new SudokuVerifier(game.board);
+            
+            return game;
+        } catch (IOException e) {
+            throw new NotFoundException("Failed to load game: " + e.getMessage());
+        }
+    }
+    
+    @Override
     public Game getGame(DifficultyEnum level) throws NotFoundException {
         try {
             Game game = storageManager.loadGame(level);
@@ -109,6 +123,11 @@ public class SudokuController implements Viewable {
     /**
      * Updates a cell value (without UserAction - for internal use).
      * Returns the previous value.
+     * @param row
+     * @param col
+     * @param newValue
+     * @return 
+     * @throws java.io.IOException
      */
     public int updateCellValue(int row, int col, int newValue) throws IOException {
         if (currentGame == null)

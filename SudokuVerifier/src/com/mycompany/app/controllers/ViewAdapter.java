@@ -29,6 +29,11 @@ public class ViewAdapter implements Controllable {
         Catalog catalog = controller.getCatalog();
         return new boolean[] { catalog.current, catalog.allModesExist };
     }
+    
+    public int[][] getUnfinishedGame() throws NotFoundException {
+        Game game = controller.getUnfinishedGame();
+        return game.board;
+    }
 
     @Override
     public int[][] getGame(char level) throws NotFoundException {

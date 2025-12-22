@@ -64,5 +64,7 @@ public interface Viewable {
      * @throws IOException if logging fails
      */
     void logUserAction(String userAction) throws IOException;
+    
+    Game getUnfinishedGame() throws NotFoundException;
 }
 
