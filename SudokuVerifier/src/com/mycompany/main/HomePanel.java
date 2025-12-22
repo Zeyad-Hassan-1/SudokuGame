@@ -28,19 +28,107 @@ public class HomePanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        logo = new javax.swing.JLabel();
+        btnEasy = new javax.swing.JButton();
+        btnMedium = new javax.swing.JButton();
+        btnEasy2 = new javax.swing.JButton();
+
+        setBackground(new java.awt.Color(255, 255, 255));
+        setForeground(new java.awt.Color(0, 0, 0));
+        setMaximumSize(new java.awt.Dimension(1920, 1080));
+        setMinimumSize(new java.awt.Dimension(1280, 720));
+        setPreferredSize(new java.awt.Dimension(1280, 720));
+
+        logo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/LOGO.png"))); // NOI18N
+
+        btnEasy.setBackground(new java.awt.Color(255, 255, 255));
+        btnEasy.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
+        btnEasy.setForeground(new java.awt.Color(153, 0, 0));
+        btnEasy.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/arrow.jpg"))); // NOI18N
+        btnEasy.setText("Easy");
+        btnEasy.setBorder(null);
+        btnEasy.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        btnEasy.setIconTextGap(0);
+        btnEasy.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEasyActionPerformed(evt);
+            }
+        });
+
+        btnMedium.setBackground(new java.awt.Color(255, 255, 255));
+        btnMedium.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
+        btnMedium.setForeground(new java.awt.Color(153, 0, 0));
+        btnMedium.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/arrow.jpg"))); // NOI18N
+        btnMedium.setText("Medium");
+        btnMedium.setBorder(null);
+        btnMedium.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        btnMedium.setIconTextGap(1);
+        btnMedium.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnMediumActionPerformed(evt);
+            }
+        });
+
+        btnEasy2.setBackground(new java.awt.Color(255, 255, 255));
+        btnEasy2.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
+        btnEasy2.setForeground(new java.awt.Color(153, 0, 0));
+        btnEasy2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/arrow.jpg"))); // NOI18N
+        btnEasy2.setText("Hard");
+        btnEasy2.setBorder(null);
+        btnEasy2.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        btnEasy2.setIconTextGap(0);
+        btnEasy2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEasy2ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(logo)
+                .addContainerGap(284, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(btnMedium, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 578, Short.MAX_VALUE)
+                    .addComponent(btnEasy, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnEasy2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(102, 102, 102))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addComponent(logo)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnEasy, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(btnMedium, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(btnEasy2, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(66, 66, 66))
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnEasyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEasyActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnEasyActionPerformed
+
+    private void btnMediumActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMediumActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnMediumActionPerformed
+
+    private void btnEasy2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEasy2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnEasy2ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnEasy;
+    private javax.swing.JButton btnEasy2;
+    private javax.swing.JButton btnMedium;
+    private javax.swing.JLabel logo;
     // End of variables declaration//GEN-END:variables
 }

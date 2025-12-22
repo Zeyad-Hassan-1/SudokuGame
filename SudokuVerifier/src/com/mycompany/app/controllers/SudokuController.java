@@ -8,7 +8,6 @@ import com.mycompany.app.controllers.services.storageServices.GameGenerator;
 import com.mycompany.app.controllers.services.storageServices.StorageManager;
 import com.mycompany.app.utility.CSVReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,7 +26,6 @@ import java.util.List;
 public class SudokuController implements Viewable {
     private final StorageManager storageManager;
     private final GameGenerator gameGenerator;
-    private final List<GameObserver> observers;
 
     private Game currentGame;
     private SudokuVerifier currentVerifier;
@@ -35,73 +33,8 @@ public class SudokuController implements Viewable {
     public SudokuController() {
         this.storageManager = new StorageManager();
         this.gameGenerator = new GameGenerator();
-        this.observers = new ArrayList<>();
         this.currentGame = null;
         this.currentVerifier = null;
-    }
-
-    /**
-     * Register an observer to receive notifications.
-     * 
-     * @param observer The GUI component to notify
-     */
-    public void addObserver(GameObserver observer) {
-        if (!observers.contains(observer)) {
-            observers.add(observer);
-        }
-    }
-
-    /**
-     * Unregister an observer.
-     * 
-     * @param observer The observer to remove
-     */
-    public void removeObserver(GameObserver observer) {
-        observers.remove(observer);
-    }
-
-    /**
-     * Notify all observers that a cell changed.
-     */
-    private void notifyCellChanged(int row, int col, int newValue) {
-        for (GameObserver observer : observers) {
-            observer.onCellChanged(row, col, newValue);
-        }
-    }
-
-    /**
-     * Notify all observers that an undo occurred.
-     */
-    private void notifyUndo(int row, int col, int restoredValue) {
-        for (GameObserver observer : observers) {
-            observer.onUndo(row, col, restoredValue);
-        }
-    }
-
-    /**
-     * Notify all observers of verification result.
-     */
-    private void notifyGameVerified(String result) {
-        for (GameObserver observer : observers) {
-            observer.onGameVerified(result);
-        }
-    }
-    /**
-     * Notify all observers that a new game loaded.
-     */
-    private void notifyNewGameLoaded(String difficulty) {
-        for (GameObserver observer : observers) {
-            observer.onNewGameLoaded(difficulty);
-        }
-    }
-
-    /**
-     * Notify all observers that game is completed.
-     */
-    private void notifyGameCompleted() {
-        for (GameObserver observer : observers) {
-            observer.onGameCompleted();
-        }
     }
 
     @Override
@@ -119,8 +52,6 @@ public class SudokuController implements Viewable {
             currentVerifier = new SudokuVerifier(game.board);
             storageManager.saveCurrentGame(game);
             storageManager.clearGameLog();
-
-            notifyNewGameLoaded(level.toString());
 
             return game;
         } catch (IOException e) {
@@ -155,13 +86,7 @@ public class SudokuController implements Viewable {
         }
         String result = verifier.toString();
 
-        notifyGameVerified(result);
-        // Check if game is completed
-        if (verifier.getState() == SudokuVerifier.State.VALID) {
-            notifyGameCompleted();
-        }
-
-        return result;
+       return result;
     }
 
     @Override
@@ -199,15 +124,6 @@ public class SudokuController implements Viewable {
         currentGame.board[row][col] = newValue;
         currentVerifier = new SudokuVerifier(currentGame.board);
         storageManager.saveCurrentGame(currentGame);
-
-        // Notify observers
-        notifyCellChanged(row, col, newValue);
-        String verificationResult = currentVerifier.toString();
-        notifyGameVerified(verificationResult);
-        if (currentVerifier.getState() == SudokuVerifier.State.VALID) {
-            notifyGameCompleted();
-        }
-
         return previousValue;
     }
 
@@ -221,11 +137,6 @@ public class SudokuController implements Viewable {
         currentGame.board[row][col] = restoredValue;
         currentVerifier = new SudokuVerifier(currentGame.board);
         storageManager.saveCurrentGame(currentGame);
-
-        // Notify observers
-        notifyUndo(row, col, restoredValue);
-        String verificationResult = currentVerifier.toString();
-        notifyGameVerified(verificationResult);
     }
 
     /**
