@@ -4,6 +4,15 @@
  */
 package com.mycompany.main;
 
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridLayout;
+import javax.swing.BorderFactory;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
 /**
  *
  * @author Hazem
@@ -11,12 +20,45 @@ package com.mycompany.main;
 public class GamePanel extends javax.swing.JPanel {
 
     private MainFrame mainFrame;
+    private JTextField[][] cells = new JTextField[9][9];
+    private JPanel cellPanel = new JPanel(new GridLayout(9,9,2,2));
     /**
      * Creates new form GamePanel
+     * @param mainFrame
      */
     public GamePanel(MainFrame mainFrame) {
-        this.mainFrame = mainFrame;
         initComponents();
+        this.mainFrame = mainFrame;
+        setMaximumSize(new Dimension(1920,1080));
+        setMinimumSize(mainFrame.getDimension());
+        setPreferredSize(mainFrame.getDimension());
+        int cellPanelWidth= (int)((mainFrame.getDimension().width)*0.9);
+        int cellPanelHeight= (int)((mainFrame.getDimension().height)*0.8);
+        cellPanel.setPreferredSize(new Dimension(cellPanelWidth,cellPanelHeight));
+        for(int row =0;row<9;row++)
+        {
+            for(int col =0;col<9;col++)
+            {
+                cells[row][col] = new JTextField();
+                int top = (row % 3 == 0) ? 3 : 1;
+                int left = (col % 3 == 0) ? 3 : 1;
+                int bottom = (row == 8) ? 3 : ((row + 1) % 3 == 0 ? 3 : 1);
+                int right = (col == 8) ? 3 : ((col + 1) % 3 == 0 ? 3 : 1);
+                cells[row][col].setBorder(BorderFactory.createMatteBorder( top, left, bottom, right, Color.BLACK ));
+                cells[row][col].setHorizontalAlignment(JTextField.CENTER);
+                cells[row][col].setFont(new Font("Arial", Font.BOLD, 36));
+                cells[row][col].setText("0");
+                cellPanel.add(cells[row][col]);
+            }
+        }
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.anchor = GridBagConstraints.CENTER;
+        add(cellPanel, gbc);
+        cellPanel.setVisible(true);
     }
 
     /**
@@ -27,20 +69,124 @@ public class GamePanel extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-        );
+        btnBack = new javax.swing.JButton();
+        btnVerify = new javax.swing.JButton();
+        btnUndo = new javax.swing.JButton();
+        btnSolve = new javax.swing.JButton();
+        labelTitle = new javax.swing.JLabel();
+
+        setBackground(new java.awt.Color(204, 204, 204));
+        setMaximumSize(new java.awt.Dimension(1280, 720));
+        setMinimumSize(new java.awt.Dimension(1280, 720));
+        setLayout(new java.awt.GridBagLayout());
+
+        btnBack.setBackground(new java.awt.Color(255, 153, 153));
+        btnBack.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnBack.setForeground(new java.awt.Color(0, 0, 0));
+        btnBack.setText("Back");
+        btnBack.setOpaque(true);
+        btnBack.setPreferredSize(new java.awt.Dimension(90, 40));
+        btnBack.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBackActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 10, 5, 5);
+        add(btnBack, gridBagConstraints);
+
+        btnVerify.setBackground(new java.awt.Color(153, 255, 153));
+        btnVerify.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnVerify.setForeground(new java.awt.Color(0, 0, 0));
+        btnVerify.setText("Verify");
+        btnVerify.setOpaque(true);
+        btnVerify.setPreferredSize(new java.awt.Dimension(90, 40));
+        btnVerify.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnVerifyActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 10, 5, 5);
+        add(btnVerify, gridBagConstraints);
+
+        btnUndo.setBackground(new java.awt.Color(255, 255, 153));
+        btnUndo.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnUndo.setForeground(new java.awt.Color(0, 0, 0));
+        btnUndo.setText("Undo");
+        btnUndo.setOpaque(true);
+        btnUndo.setPreferredSize(new java.awt.Dimension(90, 40));
+        btnUndo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnUndoActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 10, 5, 212);
+        add(btnUndo, gridBagConstraints);
+
+        btnSolve.setBackground(new java.awt.Color(153, 153, 255));
+        btnSolve.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnSolve.setForeground(new java.awt.Color(0, 0, 0));
+        btnSolve.setText("Solve");
+        btnSolve.setOpaque(true);
+        btnSolve.setPreferredSize(new java.awt.Dimension(90, 40));
+        btnSolve.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSolveActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 10, 5, 106);
+        add(btnSolve, gridBagConstraints);
+
+        labelTitle.setFont(new java.awt.Font("Old English Text MT", 1, 48)); // NOI18N
+        labelTitle.setForeground(new java.awt.Color(0, 0, 0));
+        labelTitle.setText("Sudoku");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
+        gridBagConstraints.insets = new java.awt.Insets(5, 10, 10, 0);
+        add(labelTitle, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnBackActionPerformed
+
+    private void btnVerifyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerifyActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnVerifyActionPerformed
+
+    private void btnUndoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUndoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnUndoActionPerformed
+
+    private void btnSolveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolveActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnSolveActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnBack;
+    private javax.swing.JButton btnSolve;
+    private javax.swing.JButton btnUndo;
+    private javax.swing.JButton btnVerify;
+    private javax.swing.JLabel labelTitle;
     // End of variables declaration//GEN-END:variables
 }

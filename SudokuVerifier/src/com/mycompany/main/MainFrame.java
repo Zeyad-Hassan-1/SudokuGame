@@ -1,6 +1,9 @@
 package com.mycompany.main;
 
 
+import com.mycompany.app.controllers.SudokuController;
+import com.mycompany.app.controllers.ViewAdapter;
+import com.mycompany.app.controllers.services.GameObserver;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -15,33 +18,40 @@ import javax.swing.JFrame;
  *
  * @author Hazem
  */
-public class MainFrame extends javax.swing.JFrame {
+public class MainFrame extends javax.swing.JFrame /*implements GameObserver*/ {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(MainFrame.class.getName());
-    private CardLayout cardLayout;
-    private HomePanel homePanel;
-    private GamePanel gamePanel;
-
+    private final CardLayout cardLayout;
+    private final HomePanel homePanel;
+    private final GamePanel gamePanel;
+    private final SudokuController controller = new SudokuController();
+    private final ViewAdapter adapter = new ViewAdapter(controller);
+    private final Dimension dimension = new Dimension(1280,720);
     /**
      * Creates new form MainFrame
      */
     public MainFrame() {
+        initComponents();
         setTitle("Sudoku Game");
         setSize(1280,720);
-        setMinimumSize(new Dimension(1280,720));
+        setMinimumSize(dimension);
+        setMaximumSize(new Dimension(1920,1080));
+        setPreferredSize(dimension);
+        
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         cardLayout = new CardLayout();
+        setLayout(cardLayout);
         setBackground(Color.white);
-        initComponents();
         
        homePanel = new HomePanel(this);
        add(homePanel,"home");
        
        gamePanel = new GamePanel(this);
+       add(gamePanel,"game");
        
-       cardLayout.show(getContentPane(), "home");
-        setVisible(true);
+       cardLayout.show(getContentPane(), "game");
+       setVisible(true);
     }
 
     /**
@@ -108,6 +118,51 @@ public class MainFrame extends javax.swing.JFrame {
     {
         return this.gamePanel;
     }
+    
+    public Dimension getDimension()
+    {
+        return this.dimension;
+    }
+    
+//    @Override
+//    /**
+//     * Called when a single cell value changes (user input).
+//     * @param row Row index (0-8)
+//     * @param col Column index (0-8)
+//     * @param newValue New value (0-9, where 0 means empty)
+//     */
+//    void onCellChanged(int row, int col, int newValue);
+//    
+//    @Override
+//    /**
+//     * Called when an undo operation is performed.
+//     * @param row Row index of the cell being restored
+//     * @param col Column index of the cell being restored
+//     * @param restoredValue The value being restored
+//     */
+//    void onUndo(int row, int col, int restoredValue);
+//    
+//    @Override
+//    /**
+//     * Called when the game verification status changes.
+//     * @param verificationResult String in format "STATE|row,col|row,col|..."
+//     *                           where STATE is VALID, INVALID, or INCOMPLETE
+//     *                           and row,col pairs indicate invalid cells (if any)
+//     */
+//    void onGameVerified(String verificationResult);
+//    
+//    @Override
+//    /**
+//     * Called when a new game is loaded.
+//     * @param difficulty The difficulty level of the new game
+//     */
+//    void onNewGameLoaded(String difficulty);
+//    
+//    @Override
+//    /**
+//     * Called when a game is completed successfully (valid and no empty cells).
+//     */
+//    void onGameCompleted();
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables

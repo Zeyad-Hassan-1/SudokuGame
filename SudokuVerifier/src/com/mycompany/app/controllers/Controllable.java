@@ -10,7 +10,7 @@ import java.io.IOException;
 /**
  * Interface of the viewer representing the actions that are needed by the controller.
  */
-interface Controllable {
+public interface Controllable {
     boolean[] getCatalog();
 
     int[][] getGame(char level) throws NotFoundException;
